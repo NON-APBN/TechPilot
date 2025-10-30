@@ -1,12 +1,15 @@
+
 import 'package:flutter/material.dart';
 import 'models/gadget.dart';
 import 'widgets/top_nav_bar.dart';
+// import 'widgets/welcome_dialog_wrapper.dart'; // Hapus import ini
 import 'pages/home_page.dart';
 import 'pages/ai_assistant_page.dart';
 import 'pages/smart_recommendation_page.dart';
 import 'pages/browser_page.dart';
 import 'pages/compare_page.dart';
 import 'pages/product_detail_page.dart';
+import 'pages/welcome_page.dart'; // Import WelcomePage yang baru
 
 void main() {
   runApp(const GadgetHubApp());
@@ -20,19 +23,16 @@ class GadgetHubApp extends StatelessWidget {
     return MaterialApp(
       title: 'GadgetHub',
       debugShowCheckedModeBanner: false,
-      // ### PERUBAHAN UTAMA ADA DI SINI ###
       theme: ThemeData(
-        // Warna utama diubah menjadi ungu/biru sesuai gambar
         primaryColor: const Color(0xFF6A5AE0),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF6A5AE0),
-          primary: const Color(0xFF6A5AE0), // Warna utama untuk tombol, ikon, dll.
-          secondary: const Color(0xFF9461F8), // Warna sekunder untuk gradasi
-          surface: Colors.white, // Warna untuk Card
-          background: const Color(0xFFF7F7FB), // Warna latar belakang halaman
+          primary: const Color(0xFF6A5AE0),
+          secondary: const Color(0xFF9461F8),
+          surface: Colors.white,
+          background: const Color(0xFFF7F7FB),
         ),
         scaffoldBackgroundColor: const Color(0xFFF7F7FB),
-        // AppBar diubah menjadi putih
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           foregroundColor: Color(0xFF333333),
@@ -52,7 +52,6 @@ class GadgetHubApp extends StatelessWidget {
           titleLarge: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333), fontSize: 20),
           bodyMedium: TextStyle(color: Color(0xFF555555), height: 1.6, fontSize: 16),
         ),
-        // Tombol diubah menjadi warna ungu/biru
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
             backgroundColor: const Color(0xFF6A5AE0),
@@ -73,7 +72,8 @@ class GadgetHubApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (_) => const Shell(child: HomePage()),
+        '/': (_) => const WelcomePage(), // Rute awal ke WelcomePage
+        '/home': (_) => const Shell(child: HomePage()), // Rute baru untuk halaman utama
         '/ai': (_) => const Shell(child: AIAssistantPage()),
         '/rekomendasi': (_) => const Shell(child: SmartRecommendationPage()),
         '/jelajah': (_) => const Shell(child: BrowsePage()),
@@ -114,7 +114,7 @@ class Shell extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0), // Jarak atas sudah diperkecil
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
             child: child,
           ),
         ),
@@ -122,4 +122,3 @@ class Shell extends StatelessWidget {
     );
   }
 }
-

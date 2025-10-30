@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/gadget_browser_cubit.dart';
-import '../models/gadget.dart';
 import '../widgets/gadget_card.dart'; // Import GadgetCard yang baru
 
 class BrowsePage extends StatelessWidget {
