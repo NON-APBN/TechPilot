@@ -1,44 +1,25 @@
-import 'package:flutter/material.dart';
-import '../models/gadget.dart';
-import '../data/dummy_data.dart';
-import '../shared/gadget_suggester.dart';
 
-class SmartRecommendationPage extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/smart_recommendation_cubit.dart';
+import '../widgets/gadget_list_item.dart';
+
+class SmartRecommendationPage extends StatelessWidget {
   final bool showCompareHint;
   const SmartRecommendationPage({super.key, this.showCompareHint = false});
 
   @override
-  State<SmartRecommendationPage> createState() => _SmartRecommendationPageState();
-}
-
-class _SmartRecommendationPageState extends State<SmartRecommendationPage> {
-  String _type = 'smartphone';
-  double _budget = 8;
-  final Set<String> _needs = {'kamera'};
-
-  late final List<_WithTags> _withTags =
-  allGadgets.map((g) => _WithTags(g, GadgetSuggester.deriveTags(g))).toList();
-
-  List<_WithTags> get _filtered {
-    final min = (_budget - 1).clamp(1, 100) * 1_000_000;
-    final max = (_budget + 1) * 1_000_000;
-    return _withTags.where((wt) {
-      final g = wt.g;
-      final okType = g.type == _type;
-      final okBudget = g.price >= min && g.price <= max;
-      final okNeeds = _needs.isEmpty || _needs.any((n) => wt.tags.contains(n));
-      return okType && okBudget && okNeeds;
-    }).toList();
-  }
-
-  Widget chip(String label) {
-    final selected = _needs.contains(label);
-    return FilterChip(
-      label: Text(label),
-      selected: selected,
-      onSelected: (v) => setState(() => v ? _needs.add(label) : _needs.remove(label)),
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => SmartRecommendationCubit(),
+      child: SmartRecommendationView(showCompareHint: showCompareHint),
     );
   }
+}
+
+class SmartRecommendationView extends StatelessWidget {
+  final bool showCompareHint;
+  const SmartRecommendationView({super.key, required this.showCompareHint});
 
   @override
   Widget build(BuildContext context) {
@@ -47,13 +28,40 @@ class _SmartRecommendationPageState extends State<SmartRecommendationPage> {
     return ListView(
       children: [
         const Text('Rekomendasi Pintar', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-        if (widget.showCompareHint)
+        if (showCompareHint)
           const Padding(
             padding: EdgeInsets.only(top: 6.0, bottom: 8),
             child: Text('Tips: pilih 2–3 item dari hasil untuk dibandingkan side-by-side.'),
           ),
         const SizedBox(height: 12),
-        Container(
+        const FilterControls(), // Widget untuk semua kontrol filter
+        const SizedBox(height: 16),
+        const FilterResults(), // Widget untuk menampilkan hasil filter
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+}
+
+class FilterControls extends StatelessWidget {
+  const FilterControls({super.key});
+
+  Widget _chip(BuildContext context, String label, Set<String> currentNeeds) {
+    final selected = currentNeeds.contains(label);
+    return FilterChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => context.read<SmartRecommendationCubit>().toggleNeed(label),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SmartRecommendationCubit, SmartRecommendationState>(
+      // Hanya build ulang jika filter berubah, bukan hasil
+      buildWhen: (p, c) => p.type != c.type || p.budget != c.budget || p.needs != c.needs,
+      builder: (context, state) {
+        return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
           child: Column(
@@ -66,22 +74,23 @@ class _SmartRecommendationPageState extends State<SmartRecommendationPage> {
                     const Text('Tipe: '),
                     const SizedBox(width: 8),
                     DropdownButton<String>(
-                      value: _type,
+                      value: state.type,
                       items: const [
                         DropdownMenuItem(value: 'smartphone', child: Text('Smartphone')),
                         DropdownMenuItem(value: 'laptop', child: Text('Laptop')),
                       ],
-                      onChanged: (v) => setState(() => _type = v!),
+                      onChanged: (v) => context.read<SmartRecommendationCubit>().setType(v!),
                     ),
                   ]),
                   Row(mainAxisSize: MainAxisSize.min, children: [
                     const Text('Budget: '),
                     Slider(
-                      value: _budget, min: 2, max: 40, divisions: 38,
-                      label: '${_budget.toStringAsFixed(0)} jt',
-                      onChanged: (v) => setState(() => _budget = v),
+                      value: state.budget,
+                      min: 2, max: 40, divisions: 38,
+                      label: '${state.budget.toStringAsFixed(0)} jt',
+                      onChanged: (v) => context.read<SmartRecommendationCubit>().setBudget(v),
                     ),
-                    Text('${_budget.toStringAsFixed(0)} jt'),
+                    Text('${state.budget.toStringAsFixed(0)} jt'),
                   ]),
                 ],
               ),
@@ -91,94 +100,53 @@ class _SmartRecommendationPageState extends State<SmartRecommendationPage> {
               Wrap(
                 spacing: 8,
                 children: [
-                  chip('gaming'),
-                  chip('kamera'),
-                  chip('baterai'),
-                  chip('ringan'),
-                  chip('layar'),
-                  chip('render'),
-                  chip('ai'),
+                  _chip(context, 'gaming', state.needs),
+                  _chip(context, 'kamera', state.needs),
+                  _chip(context, 'baterai', state.needs),
+                  _chip(context, 'ringan', state.needs),
+                  _chip(context, 'layar', state.needs),
+                  _chip(context, 'render', state.needs),
+                  _chip(context, 'ai', state.needs),
                 ],
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 16),
-        GridView.builder(
+        );
+      },
+    );
+  }
+}
+
+class FilterResults extends StatelessWidget {
+  const FilterResults({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isNarrow = MediaQuery.of(context).size.width < 760;
+    return BlocBuilder<SmartRecommendationCubit, SmartRecommendationState>(
+      // Hanya build ulang jika hasil berubah
+      buildWhen: (p, c) => p.results != c.results,
+      builder: (context, state) {
+        if (state.results.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text('Tidak ada hasil. Coba naikkan budget atau ubah kebutuhan.'),
+          );
+        }
+        return GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          itemCount: _filtered.length,
+          itemCount: state.results.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: isNarrow ? 1 : 2,
             crossAxisSpacing: 12, mainAxisSpacing: 12, mainAxisExtent: 180,
           ),
           itemBuilder: (_, i) {
-            final g = _filtered[i].g;
-            return Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(14),
-                boxShadow: const [BoxShadow(color: Color(0x11000000), blurRadius: 8, offset: Offset(0, 3))],
-              ),
-              child: Row(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(g.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) {
-                        return Container(color: const Color(0xFFF2F2F2), child: const Icon(Icons.image_not_supported_outlined));
-                      }),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(g.name, style: const TextStyle(fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 4),
-                        Text(
-                          [
-                            g.processor, g.storage, g.screen,
-                            if (g.camera.isNotEmpty) 'Kamera: ${g.camera}',
-                          ].where((e) => e.isNotEmpty).join(' • '),
-                          maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.black54),
-                        ),
-                        const Spacer(),
-                        Text('Rp ${g.price.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            OutlinedButton(
-                              onPressed: () => Navigator.pushNamed(context, '/detail', arguments: g),
-                              child: const Text('Detail'),
-                            ),
-                            const SizedBox(width: 8),
-                            FilledButton.tonal(onPressed: () {}, child: const Text('Bandingkan')),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
+            final g = state.results[i];
+            return GadgetListItem(gadget: g);
           },
-        ),
-        if (_filtered.isEmpty)
-          const Padding(
-            padding: EdgeInsets.only(top: 16),
-            child: Text('Tidak ada hasil. Coba naikkan budget atau ubah kebutuhan.'),
-          ),
-        const SizedBox(height: 24),
-      ],
+        );
+      },
     );
   }
-}
-
-class _WithTags {
-  final Gadget g;
-  final Set<String> tags;
-  _WithTags(this.g, this.tags);
 }
