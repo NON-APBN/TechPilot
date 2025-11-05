@@ -1,6 +1,13 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/dummy_data.dart';
+import '../data/data_asus.dart';
+import '../data/data_google.dart';
+import '../data/data_honor.dart';
+import '../data/data_huawei.dart';
+import '../data/data_infinix.dart';
+import '../data/data_itel.dart';
+import '../data/data_motorola.dart';
 import '../models/gadget.dart';
 import 'package:equatable/equatable.dart';
 
@@ -23,7 +30,9 @@ class GadgetBrowserCubit extends Cubit<GadgetBrowserState> {
     final newType = type ?? state.type;
     final newQ = (q ?? state.q).toLowerCase();
 
-    final items = allGadgets.where((g) {
+    final allItems = [...allGadgets, ...asusGadgets, ...googleGadgets, ...honorGadgets, ...huaweiGadgets, ...infinixGadgets, ...itelGadgets, ...motorolaGadgets];
+
+    final items = allItems.where((g) {
       final okType = g.type == newType;
       final okQ = newQ.isEmpty ||
           g.name.toLowerCase().contains(newQ) ||

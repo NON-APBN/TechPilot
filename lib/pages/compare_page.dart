@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
-import '../data/dummy_data.dart';
+import '../data/data_asus.dart';
+import '../data/data_google.dart';
+import '../data/data_honor.dart';
+import '../data/data_huawei.dart';
+import '../data/data_infinix.dart';
+import '../data/data_itel.dart';
+import '../data/data_motorola.dart';
+import '../data/data_oneplus.dart';
+import '../data/data_oppo.dart';
+import '../data/data_poco.dart';
+import '../data/data_realme.dart';
+import '../data/data_samsung.dart';
 import '../models/gadget.dart';
 import 'package:intl/intl.dart';
 
@@ -20,6 +31,22 @@ class _ComparePageState extends State<ComparePage> {
   Widget build(BuildContext context) {
     final priceFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     final textTheme = Theme.of(context).textTheme;
+
+    // Menggabungkan semua list gadget menjadi satu
+    final allGadgets = [
+      ...asusGadgets,
+      ...googleGadgets,
+      ...honorGadgets,
+      ...huaweiGadgets,
+      ...infinixGadgets,
+      ...itelGadgets,
+      ...motorolaGadgets,
+      ...oneplusGadgets,
+      ...oppoGadgets,
+      ...pocoGadgets,
+      ...realmeGadgets,
+      ...samsungGadgets,
+    ];
 
     // Memisahkan list gadget berdasarkan tipe
     final allSmartphones = allGadgets.where((g) => g.type == 'smartphone').toList();
@@ -184,4 +211,3 @@ class _ComparePageState extends State<ComparePage> {
     );
   }
 }
-
