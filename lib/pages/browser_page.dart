@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sizer/sizer.dart';
 import '../cubit/gadget_browser_cubit.dart';
 import '../widgets/gadget_card.dart'; // Import GadgetCard yang baru
 
@@ -21,16 +22,16 @@ class BrowseView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isNarrow = MediaQuery.of(context).size.width < 900;
+    final isNarrow = 100.w < 900;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Jelajahi Gadget', style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 16),
+        SizedBox(height: 2.h),
         Card(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
             child: Row(
               children: [
                 BlocBuilder<GadgetBrowserCubit, GadgetBrowserState>(
@@ -47,7 +48,7 @@ class BrowseView extends StatelessWidget {
                     );
                   },
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 4.w),
                 Expanded(
                   child: TextField(
                     decoration: const InputDecoration(
@@ -63,7 +64,7 @@ class BrowseView extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 2.5.h),
         Expanded(
           child: BlocBuilder<GadgetBrowserCubit, GadgetBrowserState>(
             builder: (context, state) {
@@ -71,8 +72,8 @@ class BrowseView extends StatelessWidget {
                 itemCount: state.items.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: isNarrow ? 2 : 4,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 4.w,
+                  mainAxisSpacing: 2.h,
                   childAspectRatio: 0.7,
                 ),
                 itemBuilder: (_, i) {

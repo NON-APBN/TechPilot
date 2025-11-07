@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -7,22 +8,22 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isNarrow = MediaQuery.of(context).size.width < 760;
+    final isNarrow = 100.w < 760;
 
     Widget featureCard(IconData icon, String title, String desc, VoidCallback onTap) {
       return InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12.sp),
         child: Card(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: EdgeInsets.all(18.sp),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(icon, size: 32, color: cs.primary),
-                const SizedBox(height: 16),
-                Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 6),
+                Icon(icon, size: 24.sp, color: cs.primary),
+                SizedBox(height: 2.h),
+                Text(title, style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700)),
+                SizedBox(height: 0.8.h),
                 Text(desc, style: const TextStyle(color: Colors.black54)),
               ],
             ),
@@ -34,43 +35,42 @@ class HomePage extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // PERUBAHAN: Banner diubah warnanya
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [cs.primary, cs.secondary],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(14.sp),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Temukan Gadget Impian Anda',
-                    style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                const Text('Platform terlengkap untuk mencari, membandingkan, dan mendapat rekomendasi gadget terbaik dengan bantuan AI.',
-                    style: TextStyle(color: Colors.white70, fontSize: 16, height: 1.5)),
-                const SizedBox(height: 24),
+                Text('Temukan Gadget Impian Anda',
+                    style: TextStyle(color: Colors.white, fontSize: 24.sp, fontWeight: FontWeight.bold)),
+                SizedBox(height: 1.5.h),
+                Text('Platform terlengkap untuk mencari, membandingkan, dan mendapat rekomendasi gadget terbaik dengan bantuan AI.',
+                    style: TextStyle(color: Colors.white70, fontSize: 12.sp, height: 1.5)),
+                SizedBox(height: 3.h),
                 FilledButton(
                   onPressed: () => Navigator.pushNamed(context, '/rekomendasi'),
                   style: FilledButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: cs.primary,
-                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20)),
+                      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.5.h)),
                   child: const Text('Mulai Jelajahi'),
                 )
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 3.h),
           GridView.count(
             crossAxisCount: isNarrow ? 2 : 4,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+            crossAxisSpacing: 2.w,
+            mainAxisSpacing: 2.h,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: [
@@ -80,7 +80,7 @@ class HomePage extends StatelessWidget {
               featureCard(Icons.compare_arrows_rounded, 'Perbandingan Detail', 'Bandingkan side-by-side.', () => Navigator.pushNamed(context, '/bandingkan')),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 3.h),
         ],
       ),
     );

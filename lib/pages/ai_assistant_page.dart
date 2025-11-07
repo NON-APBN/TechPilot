@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import '../data/dummy_data.dart';
 import '../shared/gadget_suggester.dart';
 
@@ -12,7 +13,8 @@ class AIAssistantPage extends StatefulWidget {
 class _AIAssistantPageState extends State<AIAssistantPage> {
   final _controller = TextEditingController();
   final List<_Msg> _messages = [
-    _Msg('assistant', 'Halo! Tulis kebutuhanmu, contoh: "budget 6-8 jt buat gaming & kamera".'),
+    _Msg('assistant',
+        'Halo! Tulis kebutuhanmu, contoh: "budget 6-8 jt buat gaming & kamera".'),
   ];
 
   void _send() {
@@ -31,32 +33,42 @@ class _AIAssistantPageState extends State<AIAssistantPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
-          child: Text('AI Assistant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+          child: Text('AI Assistant',
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w800)),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 1.5.h),
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(16),
-              boxShadow: const [BoxShadow(color: Color(0x11000000), blurRadius: 8, offset: Offset(0, 3))],
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.sp),
+              boxShadow: const [
+                BoxShadow(
+                    color: Color(0x11000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 3))
+              ],
             ),
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(4.w),
               itemCount: _messages.length,
               itemBuilder: (_, i) {
                 final m = _messages[i];
                 final isUser = m.role == 'user';
                 return Align(
-                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment:
+                      isUser ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    padding: const EdgeInsets.all(12),
-                    constraints: const BoxConstraints(maxWidth: 700),
+                    margin: EdgeInsets.symmetric(vertical: 0.8.h),
+                    padding: EdgeInsets.all(3.w),
+                    constraints: BoxConstraints(maxWidth: 70.w),
                     decoration: BoxDecoration(
-                      color: isUser ? const Color(0xFFEEF1FF) : const Color(0xFFF6F6F9),
-                      borderRadius: BorderRadius.circular(12),
+                      color: isUser
+                          ? const Color(0xFFEEF1FF)
+                          : const Color(0xFFF6F6F9),
+                      borderRadius: BorderRadius.circular(10.sp),
                     ),
                     child: Text(m.text),
                   ),
@@ -65,22 +77,27 @@ class _AIAssistantPageState extends State<AIAssistantPage> {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 1.2.h),
         Row(
           children: [
             Expanded(
               child: TextField(
                 controller: _controller,
                 onSubmitted: (_) => _send(),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Ceritakan kebutuhanmu…',
-                  filled: true, fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.sp))),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
-            FilledButton.icon(onPressed: _send, icon: const Icon(Icons.send), label: const Text('Kirim')),
+            SizedBox(width: 2.w),
+            FilledButton.icon(
+                onPressed: _send,
+                icon: const Icon(Icons.send),
+                label: const Text('Kirim')),
           ],
         ),
       ],

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -8,18 +9,18 @@ class WelcomePage extends StatelessWidget {
   Widget _buildFeatureRow(BuildContext context, {required IconData icon, required String title, required String subtitle}) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0), // Sedikit lebih banyak padding vertikal
+      padding: EdgeInsets.symmetric(vertical: 1.5.h), // Sedikit lebih banyak padding vertikal
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: theme.colorScheme.primary, size: 32), // Ikon lebih besar
-          const SizedBox(width: 20), // Spasi lebih lebar
+          Icon(icon, color: theme.colorScheme.primary, size: 24.sp), // Ikon lebih besar
+          SizedBox(width: 5.w), // Spasi lebih lebar
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)), // Judul fitur lebih menonjol
-                const SizedBox(height: 4),
+                SizedBox(height: 0.5.h),
                 Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54)),
               ],
             ),
@@ -37,7 +38,7 @@ class WelcomePage extends StatelessWidget {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(32.0), // Padding keseluruhan yang lebih besar
+            padding: EdgeInsets.all(8.w), // Padding keseluruhan yang lebih besar
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -45,10 +46,10 @@ class WelcomePage extends StatelessWidget {
                 // Ikon pembuka yang lebih besar dan menonjol
                 Icon(
                   Icons.rocket_launch_outlined, // Ikon yang lebih dinamis dan modern
-                  size: 100,
+                  size: 12.h,
                   color: theme.colorScheme.primary,
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 3.h),
                 Text(
                   'Selamat Datang di GadgetHub!',
                   style: theme.textTheme.displaySmall?.copyWith( // Menggunakan displaySmall untuk judul yang sangat besar
@@ -57,20 +58,20 @@ class WelcomePage extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 2.h),
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 700), // Batasi lebar deskripsi agar tidak terlalu panjang
+                  constraints: BoxConstraints(maxWidth: 80.w), // Batasi lebar deskripsi agar tidak terlalu panjang
                   child: Text(
                     'Platform cerdas Anda untuk menemukan gadget impian. Jelajahi rekomendasi personal, manfaatkan asisten AI, dan bandingkan spesifikasi dengan mudah.',
                     style: theme.textTheme.titleMedium?.copyWith(color: Colors.black87), // Deskripsi lebih menonjol
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 48), // Spasi lebih besar sebelum fitur
+                SizedBox(height: 6.h), // Spasi lebih besar sebelum fitur
                 
                 // Membungkus fitur dalam ConstrainedBox agar tidak terlalu lebar di layar besar
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 700), // Batasi lebar fitur agar tetap mudah dibaca
+                  constraints: BoxConstraints(maxWidth: 80.w), // Batasi lebar fitur agar tetap mudah dibaca
                   child: Column(
                     children: [
                       _buildFeatureRow(
@@ -94,20 +95,20 @@ class WelcomePage extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 48), // Spasi lebih besar sebelum tombol
+                SizedBox(height: 6.h), // Spasi lebih besar sebelum tombol
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400), // Batasi lebar tombol agar tidak terlalu lebar
+                  constraints: BoxConstraints(maxWidth: 50.w), // Batasi lebar tombol agar tidak terlalu lebar
                   child: SizedBox(
                     width: double.infinity, // Tombol mengisi lebar yang tersedia dalam ConstrainedBox
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 40), // Tombol lebih besar
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Sudut tombol lebih bulat
+                        padding: EdgeInsets.symmetric(vertical: 3.h, horizontal: 10.w), // Tombol lebih besar
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.sp)), // Sudut tombol lebih bulat
                       ),
                       onPressed: () {
                         Navigator.pushReplacementNamed(context, '/home');
                       },
-                      child: const Text('Ayo Mulai Petualangan Gadget Anda!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)), // Teks tombol lebih menarik
+                      child: Text('Ayo Mulai Petualangan Gadget Anda!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)), // Teks tombol lebih menarik
                     ),
                   ),
                 ),
