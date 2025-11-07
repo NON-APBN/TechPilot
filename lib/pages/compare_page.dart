@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sizer/sizer.dart';
 import '../cubit/compare_cubit.dart';
 import '../models/gadget.dart';
 import 'package:intl/intl.dart';
@@ -28,21 +27,21 @@ class CompareView extends StatelessWidget {
     Widget buildImagePlaceholder(Gadget? gadget) {
       if (gadget == null) {
         return Container(
-          height: 15.h,
-          width: 15.w,
+          height: 120,
+          width: 120,
           decoration: BoxDecoration(
             color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(10.sp),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Center(child: Icon(Icons.photo_size_select_actual_outlined, color: Colors.grey[400], size: 5.h)),
+          child: Center(child: Icon(Icons.photo_size_select_actual_outlined, color: Colors.grey[400], size: 40)),
         );
       }
       return ClipRRect(
-        borderRadius: BorderRadius.circular(10.sp),
+        borderRadius: BorderRadius.circular(10),
         child: Image.asset(
           gadget.image,
-          height: 15.h,
-          width: 15.w,
+          height: 120,
+          width: 120,
           fit: BoxFit.contain,
           errorBuilder: (_, __, ___) => buildImagePlaceholder(null),
         ),
@@ -69,15 +68,15 @@ class CompareView extends StatelessWidget {
     return BlocBuilder<CompareCubit, CompareState>(
       builder: (context, state) {
         return ListView(
-          padding: EdgeInsets.all(4.w),
+          padding: const EdgeInsets.all(16),
           children: [
             Text('Bandingkan Gadget', style: textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
-            SizedBox(height: 2.h),
+            const SizedBox(height: 16),
             Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.sp)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
-                padding: EdgeInsets.all(4.w),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
                     DropdownButtonFormField<String>(
@@ -92,7 +91,7 @@ class CompareView extends StatelessWidget {
                       ],
                       onChanged: (v) => context.read<CompareCubit>().onTypeSelected(v),
                     ),
-                    SizedBox(height: 2.h),
+                    const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       decoration: const InputDecoration(
                         labelText: 'Pilih Brand',
@@ -109,7 +108,7 @@ class CompareView extends StatelessWidget {
                           ? null
                           : (v) => context.read<CompareCubit>().onBrandSelected(v),
                     ),
-                    SizedBox(height: 2.h),
+                    const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(
@@ -124,7 +123,7 @@ class CompareView extends StatelessWidget {
                             onChanged: state.selectedBrand == null ? null : (v) => context.read<CompareCubit>().onGadgetASelected(v),
                           ),
                         ),
-                        SizedBox(width: 4.w),
+                        const SizedBox(width: 16),
                         Expanded(
                           child: DropdownButtonFormField<Gadget>(
                             decoration: const InputDecoration(
@@ -143,12 +142,12 @@ class CompareView extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 2.h),
+            const SizedBox(height: 16),
             if (state.gadgetA != null && state.gadgetB != null)
               Card(
                 clipBehavior: Clip.antiAlias,
                 elevation: 2,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.sp)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Table(
                   columnWidths: const {
                     0: IntrinsicColumnWidth(),
@@ -164,11 +163,11 @@ class CompareView extends StatelessWidget {
                         const TableCell(child: SizedBox()), // Empty cell for label column
                         TableCell(
                           child: Padding(
-                            padding: EdgeInsets.fromLTRB(2.w, 2.h, 2.w, 1.h),
+                            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
                             child: Column(
                               children: [
                                 Text('Gadget A', style: textTheme.titleMedium),
-                                SizedBox(height: 1.h),
+                                const SizedBox(height: 8),
                                 buildImagePlaceholder(state.gadgetA),
                               ],
                             ),
@@ -176,11 +175,11 @@ class CompareView extends StatelessWidget {
                         ),
                         TableCell(
                           child: Padding(
-                            padding: EdgeInsets.fromLTRB(2.w, 2.h, 2.w, 1.h),
+                            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
                             child: Column(
                               children: [
                                 Text('Gadget B', style: textTheme.titleMedium),
-                                SizedBox(height: 1.h),
+                                const SizedBox(height: 8),
                                 buildImagePlaceholder(state.gadgetB),
                               ],
                             ),
@@ -205,21 +204,21 @@ class CompareView extends StatelessWidget {
                           TableCell(
                             verticalAlignment: TableCellVerticalAlignment.top,
                             child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                               child: Text(specData['label'] as String, style: textTheme.bodyMedium?.copyWith(color: Colors.black54, fontWeight: FontWeight.w600)),
                             ),
                           ),
                           TableCell(
                             verticalAlignment: TableCellVerticalAlignment.top,
                             child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                               child: Text(va, style: style),
                             ),
                           ),
                           TableCell(
                             verticalAlignment: TableCellVerticalAlignment.top,
                             child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                               child: Text(vb, style: style),
                             ),
                           ),

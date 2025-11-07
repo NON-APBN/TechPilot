@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 import 'models/gadget.dart';
 import 'widgets/top_nav_bar.dart';
 // import 'widgets/welcome_dialog_wrapper.dart'; // Hapus import ini
@@ -21,85 +20,81 @@ class GadgetHubApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, orientation, deviceType) {
-        return MaterialApp(
-          title: 'GadgetHub',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primaryColor: const Color(0xFF6A5AE0),
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF6A5AE0),
-              primary: const Color(0xFF6A5AE0),
-              secondary: const Color(0xFF9461F8),
-              surface: Colors.white,
-              background: const Color(0xFFF7F7FB),
-            ),
-            scaffoldBackgroundColor: const Color(0xFFF7F7FB),
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.white,
-              foregroundColor: Color(0xFF333333),
-              elevation: 1,
-              surfaceTintColor: Colors.white,
-            ),
-            cardTheme: CardThemeData(
-              color: Colors.white,
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-            ),
-            textTheme: const TextTheme(
-              headlineMedium: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333), fontSize: 24),
-              titleLarge: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333), fontSize: 20),
-              bodyMedium: TextStyle(color: Color(0xFF555555), height: 1.6, fontSize: 16),
-            ),
-            filledButtonTheme: FilledButtonThemeData(
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF6A5AE0),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-            ),
-            outlinedButtonTheme: OutlinedButtonThemeData(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF6A5AE0),
-                side: const BorderSide(color: Color(0xFF6A5AE0)),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-            ),
-            useMaterial3: true,
+    return MaterialApp(
+      title: 'GadgetHub',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: const Color(0xFF6A5AE0),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6A5AE0),
+          primary: const Color(0xFF6A5AE0),
+          secondary: const Color(0xFF9461F8),
+          surface: Colors.white,
+          background: const Color(0xFFF7F7FB),
+        ),
+        scaffoldBackgroundColor: const Color(0xFFF7F7FB),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Color(0xFF333333),
+          elevation: 1,
+          surfaceTintColor: Colors.white,
+        ),
+        cardTheme: CardThemeData(
+          color: Colors.white,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
           ),
-          initialRoute: '/',
-          routes: {
-            '/': (_) => const WelcomePage(), // Rute awal ke WelcomePage
-            '/home': (_) => const Shell(child: HomePage()), // Rute baru untuk halaman utama
-            '/ai': (_) => const Shell(child: AIAssistantPage()),
-            '/rekomendasi': (_) => const Shell(child: SmartRecommendationPage()),
-            '/jelajah': (_) => const Shell(child: BrowsePage()),
-            '/bandingkan': (_) => const Shell(child: ComparePage()),
-          },
-          onGenerateRoute: (settings) {
-            if (settings.name == '/detail') {
-              final g = settings.arguments;
-              if (g is Gadget) {
-                return MaterialPageRoute(
-                  builder: (_) => ProductDetailPage(gadget: g),
-                  settings: settings,
-                );
-              }
-              return MaterialPageRoute(
-                  builder: (_) => const Scaffold(
-                      body: Center(child: Text("Error: Data produk tidak valid."))));
-            }
-            return null;
-          },
-          onUnknownRoute: (_) => MaterialPageRoute(builder: (_) => const Shell(child: HomePage())),
-        );
+          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+        ),
+        textTheme: const TextTheme(
+          headlineMedium: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333), fontSize: 24),
+          titleLarge: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333), fontSize: 20),
+          bodyMedium: TextStyle(color: Color(0xFF555555), height: 1.6, fontSize: 16),
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            backgroundColor: const Color(0xFF6A5AE0),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: const Color(0xFF6A5AE0),
+            side: const BorderSide(color: Color(0xFF6A5AE0)),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        ),
+        useMaterial3: true,
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (_) => const WelcomePage(), // Rute awal ke WelcomePage
+        '/home': (_) => const Shell(child: HomePage()), // Rute baru untuk halaman utama
+        '/ai': (_) => const Shell(child: AIAssistantPage()),
+        '/rekomendasi': (_) => const Shell(child: SmartRecommendationPage()),
+        '/jelajah': (_) => const Shell(child: BrowsePage()),
+        '/bandingkan': (_) => const Shell(child: ComparePage()),
       },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/detail') {
+          final g = settings.arguments;
+          if (g is Gadget) {
+            return MaterialPageRoute(
+              builder: (_) => ProductDetailPage(gadget: g),
+              settings: settings,
+            );
+          }
+          return MaterialPageRoute(
+              builder: (_) => const Scaffold(
+                  body: Center(child: Text("Error: Data produk tidak valid."))));
+        }
+        return null;
+      },
+      onUnknownRoute: (_) => MaterialPageRoute(builder: (_) => const Shell(child: HomePage())),
     );
   }
 }

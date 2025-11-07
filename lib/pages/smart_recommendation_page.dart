@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sizer/sizer.dart';
 import '../cubit/smart_recommendation_cubit.dart';
 import '../widgets/gadget_list_item.dart';
 
@@ -24,19 +23,21 @@ class SmartRecommendationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isNarrow = MediaQuery.of(context).size.width < 760;
+
     return ListView(
       children: [
-        Text('Rekomendasi Pintar', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w800)),
+        const Text('Rekomendasi Pintar', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
         if (showCompareHint)
-          Padding(
-            padding: EdgeInsets.only(top: 1.h, bottom: 1.h),
-            child: const Text('Tips: pilih 2–3 item dari hasil untuk dibandingkan side-by-side.'),
+          const Padding(
+            padding: EdgeInsets.only(top: 6.0, bottom: 8),
+            child: Text('Tips: pilih 2–3 item dari hasil untuk dibandingkan side-by-side.'),
           ),
-        SizedBox(height: 1.5.h),
+        const SizedBox(height: 12),
         const FilterControls(), // Widget untuk semua kontrol filter
-        SizedBox(height: 2.h),
+        const SizedBox(height: 16),
         const FilterResults(), // Widget untuk menampilkan hasil filter
-        SizedBox(height: 3.h),
+        const SizedBox(height: 24),
       ],
     );
   }
@@ -61,17 +62,17 @@ class FilterControls extends StatelessWidget {
       buildWhen: (p, c) => p.type != c.type || p.budget != c.budget || p.needs != c.needs,
       builder: (context, state) {
         return Container(
-          padding: EdgeInsets.all(4.w),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12.sp)),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Wrap(
-                spacing: 4.w, runSpacing: 1.5.h, crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 16, runSpacing: 12, crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Row(mainAxisSize: MainAxisSize.min, children: [
                     const Text('Tipe: '),
-                    SizedBox(width: 2.w),
+                    const SizedBox(width: 8),
                     DropdownButton<String>(
                       value: state.type,
                       items: const [
@@ -93,11 +94,11 @@ class FilterControls extends StatelessWidget {
                   ]),
                 ],
               ),
-              SizedBox(height: 1.5.h),
+              const SizedBox(height: 12),
               const Text('Kebutuhan:'),
-              SizedBox(height: 1.h),
+              const SizedBox(height: 8),
               Wrap(
-                spacing: 2.w,
+                spacing: 8,
                 children: [
                   _chip(context, 'gaming', state.needs),
                   _chip(context, 'kamera', state.needs),
@@ -121,14 +122,14 @@ class FilterResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isNarrow = 100.w < 760;
+    final isNarrow = MediaQuery.of(context).size.width < 760;
     return BlocBuilder<SmartRecommendationCubit, SmartRecommendationState>(
       // Hanya build ulang jika hasil berubah
       buildWhen: (p, c) => p.results != c.results,
       builder: (context, state) {
         if (state.results.isEmpty) {
           return Padding(
-            padding: EdgeInsets.only(top: 2.h),
+            padding: EdgeInsets.only(top: 16),
             child: const Text('Tidak ada hasil. Coba naikkan budget atau ubah kebutuhan.'),
           );
         }
@@ -138,7 +139,7 @@ class FilterResults extends StatelessWidget {
           itemCount: state.results.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: isNarrow ? 1 : 2,
-            crossAxisSpacing: 3.w, mainAxisSpacing: 1.5.h, mainAxisExtent: 22.h,
+            crossAxisSpacing: 12, mainAxisSpacing: 12, mainAxisExtent: 180,
           ),
           itemBuilder: (_, i) {
             final g = state.results[i];

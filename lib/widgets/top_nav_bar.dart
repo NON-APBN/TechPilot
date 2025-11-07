@@ -8,30 +8,55 @@ class TopNavBar extends StatelessWidget {
     final route = ModalRoute.of(context)?.settings.name ?? '/';
     final cs = Theme.of(context).colorScheme;
 
-    Widget item(String label, String path) {
+    // Widget untuk setiap item navigasi
+    Widget navItem(String label, String path, {bool isPopup = false}) {
       final isActive = route == path;
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive ? cs.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: InkWell(
-          onTap: () => Navigator.pushNamedAndRemoveUntil(context, path, (r) => false),
-          borderRadius: BorderRadius.circular(10),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: isActive ? Colors.white : Colors.black54,
-              fontSize: 15,
-            ),
-          ),
-        ),
+      return InkWell(
+        onTap: () => Navigator.pushNamedAndRemoveUntil(context, path, (r) => false),
+        borderRadius: BorderRadius.circular(10),
+        child: isPopup
+            ? Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                width: double.infinity,
+                color: isActive ? cs.primary.withOpacity(0.1) : Colors.transparent,
+                child: Text(label, style: TextStyle(color: isActive ? cs.primary : Colors.black87)),
+              )
+            : Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isActive ? cs.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: isActive ? Colors.white : Colors.black54,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
       );
     }
 
-    // PERUBAHAN: Material diubah menjadi putih
+    // Daftar item navigasi
+    final navItems = [
+      navItem('Home', '/'),
+      navItem('Jelajahi', '/jelajah'),
+      navItem('Bandingkan', '/bandingkan'),
+      navItem('Rekomendasi', '/rekomendasi'),
+      navItem('AI Assistant', '/ai'),
+    ];
+
+    // Daftar item untuk PopupMenu
+    final popupNavItems = [
+      PopupMenuItem(child: navItem('Home', '/', isPopup: true), value: '/'),
+      PopupMenuItem(child: navItem('Jelajahi', '/jelajah', isPopup: true), value: '/jelajah'),
+      PopupMenuItem(child: navItem('Bandingkan', '/bandingkan', isPopup: true), value: '/bandingkan'),
+      PopupMenuItem(child: navItem('Rekomendasi', '/rekomendasi', isPopup: true), value: '/rekomendasi'),
+      PopupMenuItem(child: navItem('AI Assistant', '/ai', isPopup: true), value: '/ai'),
+    ];
+
     return Material(
       color: Colors.white,
       elevation: 2,
@@ -50,19 +75,27 @@ class TopNavBar extends StatelessWidget {
                   fontSize: 20,
                 )),
             const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                item('Home', '/'),
-                const SizedBox(width: 8),
-                item('Jelajahi', '/jelajah'),
-                const SizedBox(width: 8),
-                item('Bandingkan', '/bandingkan'),
-                const SizedBox(width: 8),
-                item('Rekomendasi', '/rekomendasi'),
-                const SizedBox(width: 8),
-                item('AI Assistant', '/ai'),
-              ],
+            // Menggunakan LayoutBuilder untuk membuat navigasi adaptif
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // Tentukan breakpoint, misalnya 600px
+                if (constraints.maxWidth < 600) {
+                  // Tampilan untuk layar sempit (mobile)
+                  return PopupMenuButton<String>(
+                    icon: const Icon(Icons.menu), // Ikon hamburger
+                    onSelected: (path) {
+                      Navigator.pushNamedAndRemoveUntil(context, path, (r) => false);
+                    },
+                    itemBuilder: (BuildContext context) => popupNavItems,
+                  );
+                } else {
+                  // Tampilan untuk layar lebar (desktop)
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: navItems.expand((item) => [item, const SizedBox(width: 8)]).toList()..removeLast(),
+                  );
+                }
+              },
             ),
           ],
         ),
