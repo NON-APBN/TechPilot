@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import '../models/gadget.dart';
 import 'package:intl/intl.dart';
@@ -91,6 +92,7 @@ class ProductDetailPage extends StatelessWidget {
                         Text(
                           gadget.name,
                           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
+                          softWrap: true,
                         ),
                         const SizedBox(height: 5),
                         const Text(
@@ -146,18 +148,27 @@ class ProductDetailPage extends StatelessWidget {
                   Text(
                     gadget.name,
                     style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xFF333333)),
+                    softWrap: true,
                   ),
                   const SizedBox(height: 20),
                   const Text(
                     "Mengapa produk ini lebih baik daripada rata-rata?",
                     style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF555555)),
                   ),
-                  const SizedBox(height: 5),
-                  _buildInfoComparison("RAM", "${gadget.ramDetails.capacity} vs 16GB"),
-                  _buildInfoComparison("Resolusi", "${gadget.screen.split('"').first}\" vs 2.07MP"),
-                  _buildInfoComparison("Berat", "${gadget.weight} vs 2.04kg"),
-                  _buildInfoComparison("Penyimpanan", "${gadget.storage} vs 512GB"),
-                  _buildInfoComparison("VRAM", "${gadget.vram ?? '-'} vs 8GB"),
+                  const SizedBox(height: 10),
+                  Table(
+                    columnWidths: const {
+                      0: FlexColumnWidth(2),
+                      1: FlexColumnWidth(3),
+                    },
+                    children: [
+                      _buildTableRow("RAM", "${gadget.ramDetails.capacity} vs 16GB"),
+                      _buildTableRow("Resolusi", "${gadget.screen.split('"').first}\" vs 2.07MP"),
+                      _buildTableRow("Berat", "${gadget.weight} vs 2.04kg"),
+                      _buildTableRow("Penyimpanan", "${gadget.storage} vs 512GB"),
+                      _buildTableRow("VRAM", "${gadget.vram ?? '-'} vs 8GB"),
+                    ],
+                  ),
                   Container(
                     margin: const EdgeInsets.only(top: 15, bottom: 15),
                     height: 2,
@@ -182,16 +193,27 @@ class ProductDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoComparison(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF555555))),
-          Text(value, style: const TextStyle(color: Color(0xFF333333))),
-        ],
-      ),
+  TableRow _buildTableRow(String label, String value) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF555555)),
+            softWrap: true,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(color: Color(0xFF333333)),
+            softWrap: true,
+          ),
+        ),
+      ],
     );
   }
 
@@ -213,7 +235,7 @@ class ProductDetailPage extends StatelessWidget {
         crossAxisCount: 4,
         mainAxisSpacing: 20,
         crossAxisSpacing: 20,
-        childAspectRatio: 0.9,
+        childAspectRatio: 1, 
       ),
       itemCount: specCards.length,
       shrinkWrap: true,
@@ -234,7 +256,7 @@ class ProductDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF333333))),
+            Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF333333)), maxLines: 2, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 15),
             ...specs.entries.map((e) => Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
@@ -242,13 +264,14 @@ class ProductDetailPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(e.key, style: const TextStyle(color: Color(0xFF666666), fontSize: 14)),
+                  Flexible(child: Text(e.key, style: const TextStyle(color: Color(0xFF666666), fontSize: 14), softWrap: true)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       e.value,
                       textAlign: TextAlign.right,
                       style: const TextStyle(fontWeight: FontWeight.w500, color: Color(0xFF333333), fontSize: 14),
+                      softWrap: true,
                     ),
                   ),
                 ],
@@ -271,7 +294,7 @@ class ProductDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("♻️ BAHAN DAUR ULANG", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF333333))),
+            const Text("♻️ BAHAN DAUR ULANG", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF333333)), maxLines: 2, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 15),
             if (hasFeatures)
               Expanded(
@@ -288,6 +311,7 @@ class ProductDetailPage extends StatelessWidget {
                           child: Text(
                             "${feature.component}: ${feature.detail}",
                             style: const TextStyle(color: Color(0xFF666666), fontSize: 14),
+                            softWrap: true,
                           ),
                         ),
                       ],
@@ -327,9 +351,7 @@ class ProductDetailPage extends StatelessWidget {
         crossAxisCount: 3,
         mainAxisSpacing: 25,
         crossAxisSpacing: 25,
-        // ### PERBAIKAN UTAMA DI SINI ###
-        // Rasio diubah agar kartu lebih tinggi dan tidak overflow
-        childAspectRatio: 1.5,
+        childAspectRatio: 1.6,
       ),
       itemCount: benchmarkCards.length,
       shrinkWrap: true,
@@ -340,17 +362,8 @@ class ProductDetailPage extends StatelessWidget {
     );
   }
 
+  // ### PERBAIKAN UTAMA DI SINI ###
   Widget _buildBenchmarkCard(String title, int? score, String scoreSuffix, NumberFormat formatter, double percentage, String description) {
-    final String scoreText;
-    if (score != null) {
-      scoreText = "${formatter.format(score)} $scoreSuffix";
-    } else {
-      if(scoreSuffix.startsWith("Tidak diketahui")){
-        scoreText = scoreSuffix;
-      } else {
-        scoreText = "Data Tidak Tersedia";
-      }
-    }
     final double progressValue = score != null ? percentage : 0.0;
 
     return Card(
@@ -366,17 +379,32 @@ class ProductDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333))),
-            Text(
-              scoreText,
-              style: TextStyle(
-                color: score != null ? const Color(0xFF3498db) : (scoreText.startsWith("Tidak") ? const Color(0xFF333333) : Colors.grey[500]),
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333)), maxLines: 2, overflow: TextOverflow.ellipsis),
+            // Memisahkan Skor dan Suffix (Brand) untuk mencegah overflow
+            if (score != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    formatter.format(score),
+                    style: const TextStyle(color: Color(0xFF3498db), fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    scoreSuffix,
+                    style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                    softWrap: true,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              )
+            else
+              Text(
+                scoreSuffix.startsWith("Tidak diketahui") ? scoreSuffix : "Data Tidak Tersedia",
+                style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
@@ -386,7 +414,7 @@ class ProductDetailPage extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(score != null ? const Color(0xFF3498db) : Colors.grey[300]!),
               ),
             ),
-            Text(description, style: TextStyle(color: Colors.grey[600], fontSize: 13, height: 1.4)),
+            Text(description, style: TextStyle(color: Colors.grey[600], fontSize: 13, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),
