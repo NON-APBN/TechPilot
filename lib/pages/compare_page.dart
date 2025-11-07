@@ -1,89 +1,34 @@
 import 'package:flutter/material.dart';
-import '../data/data_asus.dart';
-import '../data/data_google.dart';
-import '../data/data_honor.dart';
-import '../data/data_huawei.dart';
-import '../data/data_infinix.dart';
-import '../data/data_itel.dart';
-import '../data/data_motorola.dart';
-import '../data/data_oneplus.dart';
-import '../data/data_oppo.dart';
-import '../data/data_poco.dart';
-import '../data/data_realme.dart';
-import '../data/data_samsung.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/compare_cubit.dart';
 import '../models/gadget.dart';
 import 'package:intl/intl.dart';
 
-class ComparePage extends StatefulWidget {
+class ComparePage extends StatelessWidget {
   const ComparePage({super.key});
 
   @override
-  State<ComparePage> createState() => _ComparePageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => CompareCubit(),
+      child: const CompareView(),
+    );
+  }
 }
 
-class _ComparePageState extends State<ComparePage> {
-  Gadget? a;
-  Gadget? b;
-  // State baru untuk menyimpan KATEGORI TUNGGAL yang dipilih
-  String? selectedType;
+class CompareView extends StatelessWidget {
+  const CompareView({super.key});
 
   @override
   Widget build(BuildContext context) {
     final priceFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     final textTheme = Theme.of(context).textTheme;
 
-    // Menggabungkan semua list gadget menjadi satu
-    final allGadgets = [
-      ...asusGadgets,
-      ...googleGadgets,
-      ...honorGadgets,
-      ...huaweiGadgets,
-      ...infinixGadgets,
-      ...itelGadgets,
-      ...motorolaGadgets,
-      ...oneplusGadgets,
-      ...oppoGadgets,
-      ...pocoGadgets,
-      ...realmeGadgets,
-      ...samsungGadgets,
-    ];
-
-    // Memisahkan list gadget berdasarkan tipe
-    final allSmartphones = allGadgets.where((g) => g.type == 'smartphone').toList();
-    final allLaptops = allGadgets.where((g) => g.type == 'laptop').toList();
-
-    // List dinamis untuk dropdown gadget berdasarkan kategori TUNGGAL yang dipilih
-    List<Gadget> filteredItems = [];
-    if (selectedType == 'smartphone') {
-      filteredItems = allSmartphones;
-    } else if (selectedType == 'laptop') {
-      filteredItems = allLaptops;
-    }
-
-    DropdownMenuItem<Gadget> opt(Gadget g) =>
-        DropdownMenuItem(value: g, child: SizedBox(width: 260, child: Text(g.name, overflow: TextOverflow.ellipsis)));
-
-    Widget spec(String label, String Function(Gadget) pick) {
-      final va = a != null ? pick(a!) : '-';
-      final vb = b != null ? pick(b!) : '-';
-      return Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[200]!))),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(width: 180, child: Text(label, style: textTheme.bodyMedium?.copyWith(color: Colors.black54, fontWeight: FontWeight.w600))),
-            Expanded(child: Text(va, style: textTheme.bodyMedium)),
-            Expanded(child: Text(vb, style: textTheme.bodyMedium)),
-          ],
-        ),
-      );
-    }
-
     Widget buildImagePlaceholder(Gadget? gadget) {
       if (gadget == null) {
         return Container(
           height: 120,
+          width: 120,
           decoration: BoxDecoration(
             color: Colors.grey[200],
             borderRadius: BorderRadius.circular(10),
@@ -96,118 +41,196 @@ class _ComparePageState extends State<ComparePage> {
         child: Image.asset(
           gadget.image,
           height: 120,
+          width: 120,
           fit: BoxFit.contain,
           errorBuilder: (_, __, ___) => buildImagePlaceholder(null),
         ),
       );
     }
 
-    return ListView(
-      children: [
-        Text('Bandingkan Gadget', style: textTheme.headlineMedium),
-        const SizedBox(height: 16),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                // ### PERUBAHAN UTAMA DI SINI: Satu Dropdown untuk Kategori ###
-                DropdownButton<String>(
-                  isExpanded: true,
-                  hint: const Text('Pilih Kategori Gadget'),
-                  value: selectedType,
-                  items: const [
-                    DropdownMenuItem(value: 'smartphone', child: Text('Smartphone')),
-                    DropdownMenuItem(value: 'laptop', child: Text('Laptop')),
-                  ],
-                  onChanged: (v) => setState(() {
-                    selectedType = v;
-                    // Reset pilihan gadget A dan B saat kategori berubah
-                    a = null;
-                    b = null;
-                  }),
-                  underline: const SizedBox.shrink(),
-                ),
-                const Divider(height: 24, thickness: 1),
-                Row(
+    final specs = [
+      {'label': 'Nama', 'pick': (Gadget g) => g.name},
+      {'label': 'Harga', 'pick': (Gadget g) => priceFormatter.format(g.price)},
+      {'label': 'Tipe', 'pick': (Gadget g) => g.type},
+      {'label': 'Processor', 'pick': (Gadget g) => g.processor},
+      {'label': 'RAM', 'pick': (Gadget g) => '${g.ramDetails.capacity} ${g.ramDetails.type}${g.ramDetails.speed != null ? ' ${g.ramDetails.speed}' : ''}'},
+      {'label': 'Storage', 'pick': (Gadget g) => g.storage},
+      {'label': 'Layar', 'pick': (Gadget g) => g.screen},
+      {'label': 'Baterai', 'pick': (Gadget g) => g.battery},
+      {'label': 'Kamera', 'pick': (Gadget g) => g.camera},
+      {'label': 'Bobot', 'pick': (Gadget g) => g.weight},
+      {'label': 'Geekbench Single', 'pick': (Gadget g) => g.benchmarks.geekbenchSingle?.toString() ?? '-'},
+      {'label': 'Geekbench Multi', 'pick': (Gadget g) => g.benchmarks.geekbenchMulti?.toString() ?? '-'},
+      {'label': 'GPU', 'pick': (Gadget g) => g.benchmarks.gpuName ?? '-'},
+      {'label': 'VRAM', 'pick': (Gadget g) => g.vram ?? '-'},
+    ];
+
+    return BlocBuilder<CompareCubit, CompareState>(
+      builder: (context, state) {
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Text('Bandingkan Gadget', style: textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: DropdownButton<Gadget>(
-                        isExpanded: true,
-                        hint: const Text('Pilih Gadget A'),
-                        value: a,
-                        // Gunakan list yang sudah difilter
-                        items: filteredItems.map(opt).toList(),
-                        // Nonaktifkan jika belum ada kategori yang dipilih
-                        onChanged: selectedType == null ? null : (v) => setState(() => a = v),
-                        underline: const SizedBox.shrink(),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: 'Pilih Kategori',
+                        border: OutlineInputBorder(),
                       ),
+                      value: state.selectedType,
+                      items: const [
+                        DropdownMenuItem(value: 'smartphone', child: Text('Smartphone')),
+                        DropdownMenuItem(value: 'laptop', child: Text('Laptop')),
+                      ],
+                      onChanged: (v) => context.read<CompareCubit>().onTypeSelected(v),
                     ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: DropdownButton<Gadget>(
-                        isExpanded: true,
-                        hint: const Text('Pilih Gadget B'),
-                        value: b,
-                        // Gunakan list yang sudah difilter
-                        items: filteredItems.map(opt).toList(),
-                        onChanged: selectedType == null ? null : (v) => setState(() => b = v),
-                        underline: const SizedBox.shrink(),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: 'Pilih Brand',
+                        border: OutlineInputBorder(),
                       ),
+                      value: state.selectedBrand,
+                      items: state.availableBrands.map((String brand) {
+                        return DropdownMenuItem<String>(
+                          value: brand,
+                          child: Text(brand),
+                        );
+                      }).toList(),
+                      onChanged: state.selectedType == null
+                          ? null
+                          : (v) => context.read<CompareCubit>().onBrandSelected(v),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<Gadget>(
+                            decoration: const InputDecoration(
+                              labelText: 'Pilih Gadget A',
+                              border: OutlineInputBorder(),
+                            ),
+                            isExpanded: true,
+                            value: state.gadgetA,
+                            items: state.filteredItems.map((g) => DropdownMenuItem(value: g, child: Text(g.name, overflow: TextOverflow.ellipsis))).toList(),
+                            onChanged: state.selectedBrand == null ? null : (v) => context.read<CompareCubit>().onGadgetASelected(v),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: DropdownButtonFormField<Gadget>(
+                            decoration: const InputDecoration(
+                              labelText: 'Pilih Gadget B',
+                              border: OutlineInputBorder(),
+                            ),
+                            isExpanded: true,
+                            value: state.gadgetB,
+                            items: state.filteredItems.map((g) => DropdownMenuItem(value: g, child: Text(g.name, overflow: TextOverflow.ellipsis))).toList(),
+                            onChanged: state.selectedBrand == null ? null : (v) => context.read<CompareCubit>().onGadgetBSelected(v),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Card(
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                color: Colors.grey[100],
-                child: Row(
+            const SizedBox(height: 16),
+            if (state.gadgetA != null && state.gadgetB != null)
+              Card(
+                clipBehavior: Clip.antiAlias,
+                elevation: 2,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: Table(
+                  columnWidths: const {
+                    0: IntrinsicColumnWidth(),
+                    1: FlexColumnWidth(1.0),
+                    2: FlexColumnWidth(1.0),
+                  },
+                  border: TableBorder(horizontalInside: BorderSide(color: Colors.grey[200]!)),
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   children: [
-                    const SizedBox(width: 180),
-                    Expanded(child: buildImagePlaceholder(a)),
-                    const SizedBox(width: 12),
-                    Expanded(child: buildImagePlaceholder(b)),
+                    TableRow(
+                      decoration: BoxDecoration(color: Colors.grey[100]),
+                      children: [
+                        const TableCell(child: SizedBox()), // Empty cell for label column
+                        TableCell(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                            child: Column(
+                              children: [
+                                Text('Gadget A', style: textTheme.titleMedium),
+                                const SizedBox(height: 8),
+                                buildImagePlaceholder(state.gadgetA),
+                              ],
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                            child: Column(
+                              children: [
+                                Text('Gadget B', style: textTheme.titleMedium),
+                                const SizedBox(height: 8),
+                                buildImagePlaceholder(state.gadgetB),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    ...specs.asMap().entries.map((entry) {
+                      int idx = entry.key;
+                      var specData = entry.value;
+                      final va = state.gadgetA != null ? (specData['pick'] as String Function(Gadget))(state.gadgetA!) : '-';
+                      final vb = state.gadgetB != null ? (specData['pick'] as String Function(Gadget))(state.gadgetB!) : '-';
+
+                      final bool areSame = va == vb;
+                      final style = areSame
+                          ? textTheme.bodyMedium?.copyWith(color: Colors.grey[600])
+                          : textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold);
+
+                      return TableRow(
+                        decoration: BoxDecoration(color: idx.isOdd ? Colors.grey[50] : Colors.white),
+                        children: [
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.top,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                              child: Text(specData['label'] as String, style: textTheme.bodyMedium?.copyWith(color: Colors.black54, fontWeight: FontWeight.w600)),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.top,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                              child: Text(va, style: style),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.top,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                              child: Text(vb, style: style),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(color: Colors.grey[200]),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 180),
-                    Expanded(child: Text('Gadget A', textAlign: TextAlign.center, style: textTheme.titleLarge?.copyWith(fontSize: 16))),
-                    Expanded(child: Text('Gadget B', textAlign: TextAlign.center, style: textTheme.titleLarge?.copyWith(fontSize: 16))),
-                  ],
-                ),
-              ),
-              spec('Nama', (g) => g.name),
-              spec('Harga', (g) => priceFormatter.format(g.price)),
-              spec('Tipe', (g) => g.type),
-              spec('Processor', (g) => g.processor),
-              spec('RAM', (g) => '${g.ramDetails.capacity} ${g.ramDetails.type}${g.ramDetails.speed != null ? ' ${g.ramDetails.speed}' : ''}'),
-              spec('Storage', (g) => g.storage),
-              spec('Layar', (g) => g.screen),
-              spec('Baterai', (g) => g.battery),
-              spec('Kamera', (g) => g.camera),
-              spec('Bobot', (g) => g.weight),
-              spec('Geekbench Single', (g) => g.benchmarks.geekbenchSingle?.toString() ?? '-'),
-              spec('Geekbench Multi', (g) => g.benchmarks.geekbenchMulti?.toString() ?? '-'),
-              spec('GPU', (g) => g.benchmarks.gpuName ?? '-'),
-              spec('VRAM', (g) => g.vram ?? '-'),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-      ],
+          ],
+        );
+      },
     );
   }
 }
