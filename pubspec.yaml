@@ -1,5 +1,5 @@
-name: gadgethub
-description: "GadgetHub – Flutter Web style app (AI Assistant, Rekomendasi, Jelajah, Bandingkan)"
+name: techpilot
+description: "TechPilot – Flutter Web style app (AI Assistant, Rekomendasi, Jelajah, Bandingkan)"
 publish_to: "none"
 
 version: 1.0.0+1

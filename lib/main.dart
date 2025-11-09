@@ -12,16 +12,16 @@ import 'pages/product_detail_page.dart';
 import 'pages/welcome_page.dart'; // Import WelcomePage yang baru
 
 void main() {
-  runApp(const GadgetHubApp());
+  runApp(const TechPilotApp());
 }
 
-class GadgetHubApp extends StatelessWidget {
-  const GadgetHubApp({super.key});
+class TechPilotApp extends StatelessWidget {
+  const TechPilotApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'GadgetHub',
+      title: 'TechPilot',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: const Color(0xFF6A5AE0),

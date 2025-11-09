@@ -50,7 +50,7 @@ class WelcomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Selamat Datang di GadgetHub!',
+                  'Selamat Datang di TechPilot!',
                   style: theme.textTheme.displaySmall?.copyWith( // Menggunakan displaySmall untuk judul yang sangat besar
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.primary,
