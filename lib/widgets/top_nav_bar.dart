@@ -78,8 +78,8 @@ class TopNavBar extends StatelessWidget {
             // Menggunakan LayoutBuilder untuk membuat navigasi adaptif
             LayoutBuilder(
               builder: (context, constraints) {
-                // Tentukan breakpoint, misalnya 600px
-                if (constraints.maxWidth < 600) {
+                // Tentukan breakpoint, misalnya 800px
+                if (constraints.maxWidth < 800) {
                   // Tampilan untuk layar sempit (mobile)
                   return PopupMenuButton<String>(
                     icon: const Icon(Icons.menu), // Ikon hamburger
