@@ -9,7 +9,7 @@ import 'pages/smart_recommendation_page.dart';
 import 'pages/browser_page.dart';
 import 'pages/compare_page.dart';
 import 'pages/product_detail_page.dart';
-import 'pages/welcome_page.dart'; // Import WelcomePage yang baru
+import 'pages/welcome_page.dart';
 
 void main() {
   runApp(const TechPilotApp());
