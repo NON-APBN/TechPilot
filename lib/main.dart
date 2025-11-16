@@ -1,8 +1,10 @@
-
+// lib/main.dart (Update: Routes & Backend Integration)
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'models/gadget.dart';
 import 'widgets/top_nav_bar.dart';
-// import 'widgets/welcome_dialog_wrapper.dart'; // Hapus import ini
 import 'pages/home_page.dart';
 import 'pages/ai_assistant_page.dart';
 import 'pages/smart_recommendation_page.dart';
@@ -10,6 +12,7 @@ import 'pages/browser_page.dart';
 import 'pages/compare_page.dart';
 import 'pages/product_detail_page.dart';
 import 'pages/welcome_page.dart';
+import 'shared/http_helper.dart';  // Tambahkan ini
 
 void main() {
   runApp(const TechPilotApp());
@@ -42,9 +45,7 @@ class TechPilotApp extends StatelessWidget {
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
           margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
         ),
         textTheme: const TextTheme(
@@ -54,9 +55,7 @@ class TechPilotApp extends StatelessWidget {
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
-            backgroundColor: const Color(0xFF6A5AE0),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         ),
@@ -72,11 +71,11 @@ class TechPilotApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (_) => const WelcomePage(), // Rute awal ke WelcomePage
-        '/home': (_) => const Shell(child: HomePage()), // Rute baru untuk halaman utama
+        '/': (_) => const WelcomePage(),
+        '/home': (_) => const Shell(child: HomePage()),
         '/ai': (_) => const Shell(child: AIAssistantPage()),
         '/rekomendasi': (_) => const Shell(child: SmartRecommendationPage()),
-        '/jelajah': (_) => const Shell(child: BrowsePage()),
+        '/jelajah': (_) => const Shell(child: BrowserPage()),
         '/bandingkan': (_) => const Shell(child: ComparePage()),
       },
       onGenerateRoute: (settings) {

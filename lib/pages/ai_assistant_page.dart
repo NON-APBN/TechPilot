@@ -1,6 +1,6 @@
+// lib/pages/ai_assistant_page.dart (Update: Integrasi fetchChat)
 import 'package:flutter/material.dart';
-import '../data/dummy_data.dart';
-import '../shared/gadget_suggester.dart';
+import '../shared/http_helper.dart';  // Import HTTP helper
 
 class AIAssistantPage extends StatefulWidget {
   const AIAssistantPage({super.key});
@@ -14,8 +14,9 @@ class _AIAssistantPageState extends State<AIAssistantPage> {
   final List<_Msg> _messages = [
     _Msg('assistant', 'Halo! Tulis kebutuhanmu, contoh: "budget 6-8 jt buat gaming & kamera".'),
   ];
+  String _currentType = 'smartphone';  // Default, bisa tambah switch untuk smartphone/laptop
 
-  void _send() {
+  void _send() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     setState(() {
@@ -23,8 +24,12 @@ class _AIAssistantPageState extends State<AIAssistantPage> {
       _controller.clear();
     });
 
-    final reply = GadgetSuggester.replyFor(text, allGadgets);
-    setState(() => _messages.add(_Msg('assistant', reply)));
+    try {
+      final reply = await fetchChat(text, _currentType);
+      setState(() => _messages.add(_Msg('assistant', reply)));
+    } catch (e) {
+      setState(() => _messages.add(_Msg('assistant', 'Error: $e')));
+    }
   }
 
   @override

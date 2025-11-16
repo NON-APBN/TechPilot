@@ -13,18 +13,14 @@ app.use(express.json({ limit: '50mb' }));
 const PORT = process.env.PORT || 3000;
 const IDR_TO_EUR = parseInt(process.env.IDR_TO_EUR) || 17000;
 
-// ========================================
 // GLOBAL DATA & MAX VALUES
-// ========================================
 let smartphones = [];
 let laptops = [];
 
 let maxAntutu = 1, maxRam = 1, maxBattery = 1, maxDxomark = 1, minPrice = Infinity;
-let maxCinebenchMulti = 1, max3DMarkGraphics = 1, maxGpuScore = 1;
+let maxCinebenchMulti = 1, max3DMarkGraphics = 1;
 
-// ========================================
 // CSV FILE LISTS
-// ========================================
 const CHIPSET_FILES = [
   'benchmark_chipset_apple.csv',
   'benchmark_chipset_exynos.csv',
@@ -50,15 +46,13 @@ const OTHER_FILES = {
   dxomark: 'benchmark_camera_dxomark.csv'
 };
 
-// ========================================
 // HELPER: Load CSV
-// ========================================
 function loadCSV(filename, callback) {
   const filePath = path.join(__dirname, 'data', filename);
   const data = [];
 
   if (!fs.existsSync(filePath)) {
-    console.warn(`File tidak ditemukan: ${filename}`);
+    console.warn(`File not found: ${filename}`);
     return callback(data);
   }
 
@@ -78,18 +72,16 @@ function loadCSV(filename, callback) {
     });
 }
 
-// ========================================
-// LOAD & MERGE SMARTPHONES
-// ========================================
+// LOAD & MERGE SMARTPHONES (ALL_SMARTPHONES_MERGED.csv)
 function loadSmartphones() {
   loadCSV('ALL_SMARTPHONES_MERGED.csv', (data) => {
     smartphones = data.map(phone => ({
-      brand: phone.Brand || phone.brand || 'Unknown',
-      device_name: phone['Device Name'] || phone.device_name || 'Unknown',
-      chipset: phone['Platform_Chipset'] || phone.chipset || '',
-      ram_gb: parseFloat(phone.Memory_Internal?.match(/(\d+)GB/)?.[1]) || 0,
-      battery_capacity: parseFloat(phone.Battery_Type?.match(/(\d+) mAh/)?.[1]) || 0,
-      main_camera_mp: parseFloat(phone.MainCamera_Single?.match(/(\d+) MP/)?.[1]) || 12,
+      brand: phone.Brand || 'Unknown',
+      device_name: phone['Device Name'] || 'Unknown',
+      chipset: phone['Platform_Chipset'] || '',
+      ram_gb: parseFloat(phone.Memory_Internal?.match(/(\d+)GB RAM/)?.[1] || 0),
+      battery_capacity: parseFloat(phone.Battery_Type?.match(/(\d+) mAh/)?.[1] || 0),
+      main_camera_mp: parseFloat(phone.MainCamera_Single?.match(/(\d+) MP/)?.[1] || phone.MainCamera_Triple?.match(/(\d+) MP/)?.[1] || 12),
       price_eur: parseFloat(phone.Misc_Price?.replace(/[^0-9.]/g, '')) || 0,
       antutu_v10_y: 0,
       overall_camera_score: 0
@@ -102,13 +94,13 @@ function loadSmartphones() {
   });
 }
 
-// Merge chipset AnTuTu
+// Merge chipset AnTuTu to smartphones
 function mergeChipsetBenchmarks() {
   let totalMerged = 0;
   CHIPSET_FILES.forEach(file => {
     loadCSV(file, (chipData) => {
       chipData.forEach(chip => {
-        const chipsetName = chip.Chipset || chip.chipset;
+        const chipsetName = chip.Chipset || '';
         const antutu = parseFloat(chip['AnTuTu v10']) || 0;
         if (!chipsetName || antutu === 0) return;
 
@@ -121,15 +113,15 @@ function mergeChipsetBenchmarks() {
       });
     });
   });
-  setTimeout(() => console.log(`Merged AnTuTu from chipsets: ${totalMerged}`), 2000);
+  setTimeout(() => console.log(`Merged AnTuTu for smartphones: ${totalMerged}`), 2000);
 }
 
-// Merge DXOMARK
+// Merge DXOMARK to smartphones
 function mergeDxomark() {
   loadCSV(OTHER_FILES.dxomark, (dxoData) => {
     let merged = 0;
     dxoData.forEach(dxo => {
-      const name = dxo['Smartphone Name'] || dxo.device_name;
+      const name = dxo['Smartphone Name'] || '';
       const score = parseFloat(dxo['Overall Camera Score']) || 0;
       if (!name || score === 0) return;
 
@@ -140,24 +132,25 @@ function mergeDxomark() {
         }
       });
     });
-    console.log(`Merged DXOMARK scores: ${merged}`);
+    console.log(`Merged DXOMARK: ${merged}`);
   });
 }
 
-// ========================================
-// LOAD & MERGE LAPTOPS (BARU: laptop_all_indonesia_fixed_v7.csv)
-// ========================================
+// LOAD & MERGE LAPTOPS (laptop_all_indonesia_fixed_v7.csv)
 function loadLaptops() {
   loadCSV('laptop_all_indonesia_fixed_v7.csv', (data) => {
     laptops = data.map(lap => ({
-      brand: lap.brand || lap.Brand || 'Unknown',
-      device_name: lap.model || lap.Model || lap.device_name || 'Unknown',
-      cpu: lap.cpu || lap.CPU || '',
-      gpu: lap.gpu || lap.GPU || '',
-      ram_gb: parseFloat(lap.ram_gb || lap.RAM || 0) || 0,
-      storage_gb: parseFloat(lap.storage_gb || lap.Storage || 0) || 0,
-      screen_size: parseFloat(lap.screen_size || lap.Screen || 0) || 0,
-      price_eur: parseFloat(lap.price || lap.Price || 0) / IDR_TO_EUR || 0,
+      brand: lap.brand || 'Unknown',
+      device_name: lap.model || 'Unknown',
+      cpu: lap.cpu || '',
+      gpu: lap.gpu || '',
+      ram_gb: parseFloat(lap.ram?.replace('GB', '') || 0),
+      storage_gb: parseFloat(lap.storage?.match(/(\d+)TB/)?.[1] * 1000 || lap.storage?.match(/(\d+)GB/)?.[1] || 0),
+      display: lap.display || '',
+      refresh_rate_hz: parseFloat(lap.refresh_rate_hz || 60),
+      panel_type: lap.panel_type || '',
+      weight_kg: parseFloat(lap.weight_kg || 0),
+      price_eur: lap.price_idr / IDR_TO_EUR || 0,
       cinebench_r23_multi: 0,
       three_d_mark_time_spy_graphics: 0
     })).filter(p => p.price_eur > 0);
@@ -169,12 +162,13 @@ function loadLaptops() {
   });
 }
 
+// Merge CPU benchmarks to laptops
 function mergeCPUBenchmarks() {
   let merged = 0;
   CPU_FILES.forEach(file => {
     loadCSV(file, (cpuData) => {
       cpuData.forEach(cpu => {
-        const cpuName = cpu.Prosesor || cpu.Chipset || cpu.CPU;
+        const cpuName = cpu.Prosesor || cpu.Chipset || '';
         const cinebench = parseFloat(cpu['Cinebench R23 Multi']) || 0;
         if (!cpuName || cinebench === 0) return;
 
@@ -187,15 +181,16 @@ function mergeCPUBenchmarks() {
       });
     });
   });
-  setTimeout(() => console.log(`Merged CPU benchmarks: ${merged}`), 2000);
+  setTimeout(() => console.log(`Merged CPU benchmarks for laptops: ${merged}`), 2000);
 }
 
+// Merge GPU benchmarks to laptops
 function mergeGPUBenchmarks() {
   let merged = 0;
   GPU_FILES.forEach(file => {
     loadCSV(file, (gpuData) => {
       gpuData.forEach(gpu => {
-        const gpuName = gpu.GPU || gpu.gpu;
+        const gpuName = gpu.GPU || '';
         const score = parseFloat(gpu['3DMark Time Spy Graphics']) || 0;
         if (!gpuName || score === 0) return;
 
@@ -208,12 +203,10 @@ function mergeGPUBenchmarks() {
       });
     });
   });
-  setTimeout(() => console.log(`Merged GPU benchmarks: ${merged}`), 2000);
+  setTimeout(() => console.log(`Merged GPU benchmarks for laptops: ${merged}`), 2000);
 }
 
-// ========================================
 // UPDATE MAX VALUES FOR NORMALIZATION
-// ========================================
 function updateMaxValues() {
   // Smartphone
   maxAntutu = Math.max(1, ...smartphones.map(p => p.antutu_v10_y));
@@ -225,23 +218,18 @@ function updateMaxValues() {
   maxCinebenchMulti = Math.max(1, ...laptops.map(l => l.cinebench_r23_multi));
   max3DMarkGraphics = Math.max(1, ...laptops.map(l => l.three_d_mark_time_spy_graphics));
 
-  minPrice = Math.min(
-    ...smartphones.map(p => p.price_eur).filter(v => v > 0),
-    ...laptops.map(l => l.price_eur).filter(v => v > 0)
-  ) || 1;
+  minPrice = Math.min(Infinity, ...smartphones.map(p => p.price_eur).filter(v => v > 0), ...laptops.map(l => l.price_eur).filter(v => v > 0)) || 1;
 
   console.log('Max values updated for ML normalization');
 }
 
-// ========================================
 // ML: WORTH SCORE
-// ========================================
 function calculateSmartphoneWorth(phone) {
   const antutu = phone.antutu_v10_y / maxAntutu;
   const ram = phone.ram_gb / maxRam;
   const battery = phone.battery_capacity / maxBattery;
   const camera = phone.overall_camera_score / maxDxomark;
-  const price = 1 / (phone.price_eur / minPrice);
+  const price = 1 / (phone.price_eur / minPrice || 1);
 
   return (0.40 * antutu + 0.20 * ram + 0.15 * battery + 0.15 * camera + 0.10 * price) * 100;
 }
@@ -250,15 +238,14 @@ function calculateLaptopWorth(laptop) {
   const cpu = laptop.cinebench_r23_multi / maxCinebenchMulti;
   const gpu = laptop.three_d_mark_time_spy_graphics / max3DMarkGraphics;
   const ram = laptop.ram_gb / maxRam;
-  const price = 1 / (laptop.price_eur / minPrice);
+  const price = 1 / (laptop.price_eur / minPrice || 1);
 
   return (0.35 * cpu + 0.35 * gpu + 0.20 * ram + 0.10 * price) * 100;
 }
 
-// ========================================
-// API ENDPOINTS
-// ========================================
+// API ENDPOINTS (FULLY FUNCTIONAL)
 
+// Health Check
 app.get('/', (req, res) => {
   res.json({
     status: 'TechPilot Backend Aktif!',
@@ -291,8 +278,7 @@ app.get('/rank', (req, res) => {
       device_name: p.device_name,
       harga_rp: Math.round(p.price_eur * IDR_TO_EUR),
       worth_score: p.worth_score.toFixed(2),
-      winner: i === 0,
-      type: type
+      winner: i === 0
     }));
 
   res.json(result);
@@ -327,8 +313,7 @@ app.post('/compare', (req, res) => {
       device_name: p.device_name,
       harga_rp: Math.round(p.price_eur * IDR_TO_EUR),
       worth_score: p.worth_score.toFixed(2),
-      winner: i === 0,
-      type: type
+      winner: i === 0
     }));
 
   res.json(result);
@@ -376,9 +361,7 @@ app.post('/chat', (req, res) => {
   res.json({ reply });
 });
 
-// ========================================
 // START SERVER
-// ========================================
 loadSmartphones();
 loadLaptops();
 
