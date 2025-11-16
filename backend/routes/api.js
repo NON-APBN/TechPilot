@@ -1,16 +1,15 @@
-// routes/api.js
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser'); // Pastikan sudah: npm install csv-parser
+const axios = require('axios'); // Pastikan sudah: npm install axios
 
 const router = express.Router();
 
 // Objek ini akan menampung SEMUA data dari SEMUA file CSV
-// Contoh: { "ALL_SMARTPHONES_MERGED": [ ...data ], "laptops_all_indonesia_fixed_v7": [ ...data ] }
 let loadedDatasets = {};
 
-// Path ke direktori data, diasumsikan server.js ada di root
+// Path ke direktori data - SAYA KEMBALIKAN KE VERSI YANG BENAR SESUAI LOG ANDA
 const DATA_DIR = path.join(process.cwd(), 'data');
 
 /**
@@ -20,17 +19,12 @@ async function loadAllCsvData() {
     console.log(`--- [INFO] Memulai pemindaian direktori: ${DATA_DIR}`);
 
     try {
-        // 1. Cek apakah direktori ada
         if (!fs.existsSync(DATA_DIR)) {
             console.error(`!!! [ERROR] Direktori data tidak ditemukan di: ${DATA_DIR}`);
-            console.error("!!! [ERROR] Pastikan folder 'backend/data' ada di root proyek Anda.");
             return;
         }
 
-        // 2. Baca semua file di dalam DATA_DIR
         const files = await fs.promises.readdir(DATA_DIR);
-
-        // 3. Filter hanya file yang berakhiran .csv
         const csvFiles = files.filter(file => file.endsWith('.csv'));
 
         if (csvFiles.length === 0) {
@@ -40,12 +34,10 @@ async function loadAllCsvData() {
 
         console.log(`--- [INFO] Menemukan ${csvFiles.length} file CSV. Memulai pemuatan...`);
 
-        // 4. Loop setiap file CSV dan muat datanya
         for (const fileName of csvFiles) {
             const filePath = path.join(DATA_DIR, fileName);
             const data = [];
 
-            // Bungkus stream dalam Promise agar bisa ditunggu (await)
             await new Promise((resolve, reject) => {
                 fs.createReadStream(filePath)
                     .pipe(csv())
@@ -53,12 +45,8 @@ async function loadAllCsvData() {
                         data.push(row);
                     })
                     .on('end', () => {
-                        // Buat key dari nama file, hilangkan .csv
                         const datasetKey = path.basename(fileName, '.csv');
-
-                        // Simpan data ke objek utama
                         loadedDatasets[datasetKey] = data;
-
                         console.log(`--- [SUCCESS] ${fileName} dimuat (${data.length} baris). Disimpan ke key: '${datasetKey}'`);
                         resolve();
                     })
@@ -68,9 +56,7 @@ async function loadAllCsvData() {
                     });
             });
         }
-
         console.log("--- [SUCCESS] Semua dataset CSV telah berhasil dimuat ke memori.");
-
     } catch (err) {
         console.error(`!!! [ERROR] Gagal memuat data: ${err.message}`);
     }
@@ -79,12 +65,8 @@ async function loadAllCsvData() {
 // Jalankan fungsi pemuat data saat server dimulai
 loadAllCsvData();
 
-// --- ENDPOINTS API ---
+// --- ENDPOINTS API (Data Mentah) ---
 
-/**
- * Endpoint [GET] /api/datasets
- * Mengembalikan daftar semua dataset (nama file) yang berhasil dimuat.
- */
 router.get('/datasets', (req, res) => {
     const datasetKeys = Object.keys(loadedDatasets);
     res.status(200).json({
@@ -93,11 +75,6 @@ router.get('/datasets', (req, res) => {
     });
 });
 
-/**
- * Endpoint Dinamis [GET] /api/data/:datasetName
- * Mengembalikan data spesifik berdasarkan nama dataset (key).
- * Contoh: /api/data/laptops_all_indonesia_fixed_v7
- */
 router.get('/data/:datasetName', (req, res) => {
     const datasetName = req.params.datasetName;
     const data = loadedDatasets[datasetName];
@@ -117,10 +94,6 @@ router.get('/data/:datasetName', (req, res) => {
     }
 });
 
-/**
- * Endpoint [GET] /api/items
- * Alias untuk dataset 'ALL_SMARTPHONES_MERGED'
- */
 router.get('/items', (req, res) => {
     const data = loadedDatasets['ALL_SMARTPHONES_MERGED'];
     if (data) {
@@ -135,5 +108,45 @@ router.get('/items', (req, res) => {
         });
     }
 });
+
+
+// --- ENDPOINT BARU UNTUK REKOMENDASI (Memanggil Python) ---
+// URL: GET http://localhost:3000/api/recommend/laptops?min=5000000&max=10000000
+
+router.get('/recommend/laptops', async (req, res) => {
+    try {
+        const minPrice = parseInt(req.query.min) || 0;
+        const maxPrice = parseInt(req.query.max) || 100000000;
+
+        console.log(`[Node.js] Menerima permintaan rekomendasi laptop harga ${minPrice} - ${maxPrice}`);
+
+        const payload = {
+            min_price: minPrice,
+            max_price: maxPrice,
+            type: "laptop"
+        };
+
+        // 3. Panggil API Python (port 5000) menggunakan axios
+        console.log('[Node.js] Meneruskan permintaan ke Python ML Service (port 5000)...');
+
+        const pythonResponse = await axios.post(
+            'http://localhost:5000/recommend', // URL server Python
+            payload
+        );
+
+        // 4. Kirim kembali hasil dari Python ke user (Flutter)
+        console.log('[Node.js] Menerima jawaban dari Python. Mengirim ke klien.');
+        res.status(200).json(pythonResponse.data);
+
+    } catch (error) {
+        // Tangani jika server Python mati atau error
+        console.error("[Node.js] Error saat memanggil Python Service:", error.message);
+        res.status(500).json({
+            message: "Gagal memproses rekomendasi. Pastikan ML service (Python) berjalan di port 5000.",
+            error: error.message
+        });
+    }
+});
+
 
 module.exports = router;
