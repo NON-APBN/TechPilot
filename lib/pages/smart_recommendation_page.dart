@@ -1,8 +1,7 @@
-// lib/pages/smart_recommendation_page.dart (Update: Integrasi fetchRank)
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/smart_recommendation_cubit.dart';
-import '../shared/http_helper.dart';
+import '../models/gadget.dart'; // Impor model Gadget
 import '../widgets/gadget_list_item.dart';
 
 class SmartRecommendationPage extends StatelessWidget {
@@ -24,8 +23,6 @@ class SmartRecommendationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isNarrow = MediaQuery.of(context).size.width < 760;
-
     return ListView(
       children: [
         const Text('Rekomendasi Pintar', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
@@ -59,30 +56,58 @@ class FilterControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SmartRecommendationCubit, SmartRecommendationState>(
+      buildWhen: (p, c) => p.type != c.type || p.budget != c.budget || p.needs != c.needs,
       builder: (context, state) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Jenis Gadget:'),
-            const SizedBox(height: 8),
-            DropdownButton<String>(
-              value: state.type,
-              items: const [
-                DropdownMenuItem(value: 'smartphone', child: Text('Smartphone')),
-                DropdownMenuItem(value: 'laptop', child: Text('Laptop')),
-              ],
-              onChanged: (v) => context.read<SmartRecommendationCubit>().setType(v!),
-            ),
-            const SizedBox(height: 12),
-            const Text('Budget Maksimal (juta Rp):'),
-            Slider(
-              value: state.budget,
-              min: 2, max: 40, divisions: 38,
-              label: '${state.budget.toStringAsFixed(0)} jt',
-              onChanged: (v) => context.read<SmartRecommendationCubit>().setBudget(v),
-            ),
-            Text('${state.budget.toStringAsFixed(0)} jt'),
-          ],
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 16, runSpacing: 12, crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Text('Tipe: '),
+                    const SizedBox(width: 8),
+                    DropdownButton<String>(
+                      value: state.type,
+                      items: const [
+                        DropdownMenuItem(value: 'smartphone', child: Text('Smartphone')),
+                        DropdownMenuItem(value: 'laptop', child: Text('Laptop')),
+                      ],
+                      onChanged: (v) => context.read<SmartRecommendationCubit>().setType(v!),
+                    ),
+                  ]),
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Text('Budget: '),
+                    Slider(
+                      value: state.budget,
+                      min: 2, max: 40, divisions: 38,
+                      label: '${state.budget.toStringAsFixed(0)} jt',
+                      onChanged: (v) => context.read<SmartRecommendationCubit>().setBudget(v),
+                    ),
+                    Text('${state.budget.toStringAsFixed(0)} jt'),
+                  ]),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Text('Kebutuhan:'),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  _chip(context, 'gaming', state.needs),
+                  _chip(context, 'kamera', state.needs),
+                  _chip(context, 'baterai', state.needs),
+                  _chip(context, 'ringan', state.needs),
+                  _chip(context, 'layar', state.needs),
+                  _chip(context, 'render', state.needs),
+                  _chip(context, 'ai', state.needs),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );
@@ -96,50 +121,28 @@ class FilterResults extends StatelessWidget {
   Widget build(BuildContext context) {
     final isNarrow = MediaQuery.of(context).size.width < 760;
     return BlocBuilder<SmartRecommendationCubit, SmartRecommendationState>(
+      buildWhen: (p, c) => p.results != c.results,
       builder: (context, state) {
-        return FutureBuilder<List<Map<String, dynamic>>>(
-          future: fetchRank(state.type, 0, (state.budget * 1000000).toInt()),  // Min 0, max budget
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-            final items = snapshot.data ?? [];
-            return GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: items.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: isNarrow ? 1 : 2,
-                crossAxisSpacing: 12, mainAxisSpacing: 12, mainAxisExtent: 180,
-              ),
-              itemBuilder: (_, i) {
-                final g = items[i];
-                return GadgetListItem(
-                  gadget: Gadget(
-                    id: g['rank'],
-                    name: g['device_name'],
-                    type: state.type,
-                    price: g['harga_rp'].toDouble(),
-                    processor: '',  // Tambah jika backend kirim
-                    storage: '',
-                    screen: '',
-                    battery: '',
-                    camera: '',
-                    weight: '',
-                    rating: 0.0,
-                    image: 'assets/images/${g['device_name'].toLowerCase().replaceAll(' ', '_')}.jpg',
-                    isPopular: false,
-                    isNewest: false,
-                    ramDetails: const RamDetails(capacity: '', type: ''),
-                    cpuDetails: const CpuDetails(),
-                    benchmarks: const BenchmarkScores(),
-                  ),
-                );
-              },
-            );
+        if (state.allGadgetsWithTags.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state.results.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text('Tidak ada hasil. Coba naikkan budget atau ubah kebutuhan.'),
+          );
+        }
+        return GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: state.results.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: isNarrow ? 1 : 2,
+            crossAxisSpacing: 12, mainAxisSpacing: 12, mainAxisExtent: 180,
+          ),
+          itemBuilder: (_, i) {
+            final g = state.results[i];
+            return GadgetListItem(gadget: g);
           },
         );
       },

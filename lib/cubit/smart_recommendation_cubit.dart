@@ -1,17 +1,25 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../data/dummy_data.dart';
 import '../models/gadget.dart';
+import '../services/gadget_services.dart';
 import '../shared/gadget_suggester.dart';
 
 part 'smart_recommendation_state.dart';
 
 class SmartRecommendationCubit extends Cubit<SmartRecommendationState> {
+  final GadgetService _gadgetService = GadgetService();
+
   SmartRecommendationCubit() : super(const SmartRecommendationState()) {
-    // Inisialisasi semua gadget dengan tag-nya sekali saja
-    final allGadgetsWithTags = allGadgets.map((g) => _WithTags(g, GadgetSuggester.deriveTags(g))).toList();
-    emit(state.copyWith(allGadgetsWithTags: allGadgetsWithTags));
+    _loadAndFilterGadgets();
+  }
+
+  Future<void> _loadAndFilterGadgets() async {
+    // Muat data jika belum ada
+    if (state.allGadgetsWithTags.isEmpty) {
+      final allGadgets = await _gadgetService.loadGadgets();
+      final allGadgetsWithTags = allGadgets.map((g) => _WithTags(g, GadgetSuggester.deriveTags(g))).toList();
+      emit(state.copyWith(allGadgetsWithTags: allGadgetsWithTags));
+    }
     _filterGadgets();
   }
 
@@ -37,6 +45,8 @@ class SmartRecommendationCubit extends Cubit<SmartRecommendationState> {
   }
 
   void _filterGadgets() {
+    if (state.allGadgetsWithTags.isEmpty) return;
+
     final min = (state.budget - 1).clamp(1, 100) * 1_000_000;
     final max = (state.budget + 1) * 1_000_000;
 

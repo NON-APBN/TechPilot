@@ -1,46 +1,35 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import '../data/data_asus.dart';
-import '../data/data_google.dart';
-import '../data/data_honor.dart';
-import '../data/data_huawei.dart';
-import '../data/data_infinix.dart';
-import '../data/data_itel.dart';
-import '../data/data_motorola.dart';
-import '../data/data_oneplus.dart';
-import '../data/data_oppo.dart';
-import '../data/data_poco.dart';
-import '../data/data_realme.dart';
-import '../data/data_samsung.dart';
 import '../models/gadget.dart';
+import '../services/gadget_services.dart';
 
 part 'compare_state.dart';
 
 class CompareCubit extends Cubit<CompareState> {
-  CompareCubit() : super(const CompareState());
+  final GadgetService _gadgetService = GadgetService();
+  List<Gadget> _allGadgets = [];
 
-  final Map<String, List<Gadget>> allBrandGadgets = {
-    'Asus': asusGadgets,
-    'Google': googleGadgets,
-    'Honor': honorGadgets,
-    'Huawei': huaweiGadgets,
-    'Infinix': infinixGadgets,
-    'Itel': itelGadgets,
-    'Motorola': motorolaGadgets,
-    'OnePlus': oneplusGadgets,
-    'Oppo': oppoGadgets,
-    'Poco': pocoGadgets,
-    'Realme': realmeGadgets,
-    'Samsung': samsungGadgets,
-  };
+  CompareCubit() : super(const CompareState()) {
+    _loadAllGadgets();
+  }
+
+  Future<void> _loadAllGadgets() async {
+    _allGadgets = await _gadgetService.loadGadgets();
+    // Setelah data dimuat, kita bisa inisialisasi state awal jika perlu
+    // Misalnya, langsung set tipe default
+    onTypeSelected('smartphone');
+  }
 
   void onTypeSelected(String? type) {
     if (type == null) return;
 
-    final availableBrands = allBrandGadgets.keys.where((brand) {
-      return allBrandGadgets[brand]!.any((gadget) => gadget.type == type);
-    }).toList();
+    // Dapatkan semua brand unik dari gadget yang sesuai dengan tipe yang dipilih
+    final availableBrands = _allGadgets
+        .where((gadget) => gadget.type == type)
+        .map((gadget) => gadget.name.split(' ')[0]) // Ambil brand dari nama, misal "Samsung" dari "Samsung Galaxy S23"
+        .toSet()
+        .toList();
+    availableBrands.sort();
 
     emit(state.copyWith(
       selectedType: type,
@@ -55,8 +44,9 @@ class CompareCubit extends Cubit<CompareState> {
   void onBrandSelected(String? brand) {
     if (brand == null) return;
 
-    final filteredItems = (allBrandGadgets[brand] ?? [])
-        .where((g) => g.type == state.selectedType)
+    // Filter gadget berdasarkan tipe dan brand yang dipilih
+    final filteredItems = _allGadgets
+        .where((g) => g.type == state.selectedType && g.name.startsWith(brand))
         .toList();
 
     emit(state.copyWith(

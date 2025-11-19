@@ -1,14 +1,14 @@
+# train_models.py
+# (Salin kode lengkap 'train_models.py' dari respons saya sebelumnya)
+# ... (kode lengkap dari respons sebelumnya ada di sini) ...
 import os
 import pandas as pd
 import re
-import joblib # Untuk menyimpan model
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 from xgboost import XGBRegressor
 
-# ==============================================================================
-# --- KONFIGURASI (SALIN DARI app.py LAMA, PASTIKAN INI BENAR!) ---
-# ==============================================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, '..', 'backend', 'data')
 
@@ -40,7 +40,7 @@ CONFIG = {
         'CHIPSET_SCORE': 'AnTuTu v10',
         'GPU_NAME': 'GPU',
         'GPU_SCORE': '3DMark Time Spy Graphics',
-        'CPU_NAME': 'GPU', # Aneh, tapi ini sesuai data header Anda
+        'CPU_NAME': 'GPU',
         'CPU_SCORE': 'Cinebench R23 GPU',
         'LAPTOP_NAME': 'model',
         'LAPTOP_PRICE': 'price_idr',
@@ -51,9 +51,6 @@ CONFIG = {
         'HP_CHIPSET': 'Platform_Chipset'
     }
 }
-# ==============================================================================
-# --- FUNGSI DATA PIPELINE (Disalin dari app.py) ---
-# ==============================================================================
 
 def clean_name(name):
     if not isinstance(name, str): return ""
@@ -76,7 +73,6 @@ def load_benchmark_to_map(files, name_col, score_col):
     bench_df[score_col] = pd.to_numeric(bench_df[score_col], errors='coerce').fillna(0)
     return pd.Series(bench_df[score_col].values, index=bench_df[name_col].apply(clean_name)).to_dict()
 
-# Global map (hanya untuk proses loading)
 cpu_scores_map = {}
 gpu_scores_map = {}
 chipset_scores_map = {}
@@ -117,77 +113,47 @@ def load_prep_data(data_type='laptop'):
         df['chipset_score'] = df[chipset_col].apply(clean_name).map(chipset_scores_map).fillna(0) if chipset_col in df.columns else 0
     return df
 
-# ==============================================================================
-# --- FUNGSI PELATIHAN (TRAINING) ---
-# ==============================================================================
-
 def train_laptop_model():
     print("\n--- [TRAIN] Memulai Pelatihan Model Laptop ---")
     df = load_prep_data('laptop')
-
-    # Filter data yang valid untuk dilatih
-    df_train = df[
-        (df['cpu_score'] > 0) &
-        (df['gpu_score'] > 0) &
-        (df['clean_price'] > 1000000) # Harga minimal 1 juta
-        ].copy()
-
+    df_train = df[(df['cpu_score'] > 0) & (df['gpu_score'] > 0) & (df['clean_price'] > 1000000)].copy()
     if df_train.empty:
-        print("[TRAIN ERROR] Tidak ada data laptop valid untuk dilatih. Cek CONFIG CSV_COLUMNS Anda.")
+        print("[TRAIN ERROR] Tidak ada data laptop valid untuk dilatih.")
         return
-
     print(f"[TRAIN INFO] Menggunakan {len(df_train)} data laptop untuk pelatihan.")
-
     X = df_train[['cpu_score', 'gpu_score']]
     y = df_train['clean_price']
-
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
     model = XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=5, random_state=42)
     model.fit(X_train, y_train)
-
     y_pred = model.predict(X_test)
     score = r2_score(y_test, y_pred)
     print(f"[TRAIN INFO] Model Laptop Selesai. Akurasi (R^2 Score): {score:.2f}")
-
     joblib.dump(model, 'laptop_model.pkl')
     print("[TRAIN SUCCESS] Model 'laptop_model.pkl' telah disimpan.")
 
 def train_smartphone_model():
     print("\n--- [TRAIN] Memulai Pelatihan Model Smartphone ---")
     df = load_prep_data('smartphone')
-
-    df_train = df[
-        (df['chipset_score'] > 0) &
-        (df['clean_price'] > 500000) # Harga minimal 500rb
-        ].copy()
-
+    df_train = df[(df['chipset_score'] > 0) & (df['clean_price'] > 500000)].copy()
     if df_train.empty:
-        print("[TRAIN ERROR] Tidak ada data HP valid untuk dilatih. Cek CONFIG CSV_COLUMNS Anda.")
+        print("[TRAIN ERROR] Tidak ada data HP valid untuk dilatih.")
         return
-
     print(f"[TRAIN INFO] Menggunakan {len(df_train)} data HP untuk pelatihan.")
-
-    X = df_train[['chipset_score']] # Hanya satu fitur
+    X = df_train[['chipset_score']]
     y = df_train['clean_price']
-
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
     model = XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=5, random_state=42)
     model.fit(X_train, y_train)
-
     y_pred = model.predict(X_test)
     score = r2_score(y_test, y_pred)
     print(f"[TRAIN INFO] Model HP Selesai. Akurasi (R^2 Score): {score:.2f}")
-
     joblib.dump(model, 'smartphone_model.pkl')
     print("[TRAIN SUCCESS] Model 'smartphone_model.pkl' telah disimpan.")
 
 if __name__ == "__main__":
     print("--- [TRAIN] Memuat semua data benchmark...")
     load_all_benchmarks()
-
     train_laptop_model()
     train_smartphone_model()
-
-    print("\n--- [TRAIN] Semua model telah dilatih dan disimpan. ---")
+    print("\n--- [TRAIN] Semua model telah dilatih dan disimpan. ---")fl

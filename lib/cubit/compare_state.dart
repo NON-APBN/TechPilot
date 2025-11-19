@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 part of 'compare_cubit.dart';
 
 @immutable

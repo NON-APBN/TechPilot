@@ -1,8 +1,4 @@
-// lib/main.dart (Update: Routes & Backend Integration)
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 import 'models/gadget.dart';
 import 'widgets/top_nav_bar.dart';
 import 'pages/home_page.dart';
@@ -12,7 +8,6 @@ import 'pages/browser_page.dart';
 import 'pages/compare_page.dart';
 import 'pages/product_detail_page.dart';
 import 'pages/welcome_page.dart';
-import 'shared/http_helper.dart';  // Tambahkan ini
 
 void main() {
   runApp(const TechPilotApp());
@@ -75,7 +70,7 @@ class TechPilotApp extends StatelessWidget {
         '/home': (_) => const Shell(child: HomePage()),
         '/ai': (_) => const Shell(child: AIAssistantPage()),
         '/rekomendasi': (_) => const Shell(child: SmartRecommendationPage()),
-        '/jelajah': (_) => const Shell(child: BrowserPage()),
+        '/jelajah': (_) => const Shell(child: BrowsePage()),
         '/bandingkan': (_) => const Shell(child: ComparePage()),
       },
       onGenerateRoute: (settings) {
