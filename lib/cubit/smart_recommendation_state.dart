@@ -1,45 +1,46 @@
-
 part of 'smart_recommendation_cubit.dart';
+
+enum RecommendationStatus { initial, loading, success, failure }
 
 class SmartRecommendationState extends Equatable {
   final String type;
-  final double budget;
-  final Set<String> needs;
-  final List<Gadget> results;
-  // Menyimpan gadget beserta tag-nya agar tidak perlu dihitung ulang
-  final List<_WithTags> allGadgetsWithTags;
+  final double minBudget;
+  final double maxBudget;
+  final RecommendationStatus status;
+  final List<RecommendedProduct> results;
+  final String? errorMessage;
+  final Set<RecommendedProduct> comparisonSelection;
 
   const SmartRecommendationState({
-    this.type = 'smartphone',
-    this.budget = 8.0,
-    this.needs = const {'kamera'},
+    this.type = 'laptop',
+    this.minBudget = 1.0,
+    this.maxBudget = 10.0,
+    this.status = RecommendationStatus.initial,
     this.results = const [],
-    this.allGadgetsWithTags = const [],
+    this.errorMessage,
+    this.comparisonSelection = const {},
   });
 
   SmartRecommendationState copyWith({
     String? type,
-    double? budget,
-    Set<String>? needs,
-    List<Gadget>? results,
-    List<_WithTags>? allGadgetsWithTags,
+    double? minBudget,
+    double? maxBudget,
+    RecommendationStatus? status,
+    List<RecommendedProduct>? results,
+    String? errorMessage,
+    Set<RecommendedProduct>? comparisonSelection,
   }) {
     return SmartRecommendationState(
       type: type ?? this.type,
-      budget: budget ?? this.budget,
-      needs: needs ?? this.needs,
+      minBudget: minBudget ?? this.minBudget,
+      maxBudget: maxBudget ?? this.maxBudget,
+      status: status ?? this.status,
       results: results ?? this.results,
-      allGadgetsWithTags: allGadgetsWithTags ?? this.allGadgetsWithTags,
+      errorMessage: errorMessage ?? this.errorMessage,
+      comparisonSelection: comparisonSelection ?? this.comparisonSelection,
     );
   }
 
   @override
-  List<Object> get props => [type, budget, needs, results, allGadgetsWithTags];
-}
-
-// Helper class ini kita pindahkan ke sini agar bisa diakses oleh Cubit
-class _WithTags {
-  final Gadget g;
-  final Set<String> tags;
-  _WithTags(this.g, this.tags);
+  List<Object?> get props => [type, minBudget, maxBudget, status, results, errorMessage, comparisonSelection];
 }

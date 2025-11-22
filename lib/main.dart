@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'models/gadget.dart';
 import 'widgets/top_nav_bar.dart';
 import 'pages/home_page.dart';
 import 'pages/ai_assistant_page.dart';
 import 'pages/smart_recommendation_page.dart';
 import 'pages/browser_page.dart';
 import 'pages/compare_page.dart';
-import 'pages/product_detail_page.dart';
 import 'pages/welcome_page.dart';
 
 void main() {
@@ -71,22 +69,7 @@ class TechPilotApp extends StatelessWidget {
         '/ai': (_) => const Shell(child: AIAssistantPage()),
         '/rekomendasi': (_) => const Shell(child: SmartRecommendationPage()),
         '/jelajah': (_) => const Shell(child: BrowsePage()),
-        '/bandingkan': (_) => const Shell(child: ComparePage()),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/detail') {
-          final g = settings.arguments;
-          if (g is Gadget) {
-            return MaterialPageRoute(
-              builder: (_) => ProductDetailPage(gadget: g),
-              settings: settings,
-            );
-          }
-          return MaterialPageRoute(
-              builder: (_) => const Scaffold(
-                  body: Center(child: Text("Error: Data produk tidak valid."))));
-        }
-        return null;
+        '/bandingkan': (_) => const Shell(child: ComparePage(products: [])),
       },
       onUnknownRoute: (_) => MaterialPageRoute(builder: (_) => const Shell(child: HomePage())),
     );

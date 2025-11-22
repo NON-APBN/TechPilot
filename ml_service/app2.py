@@ -1,6 +1,3 @@
-# app2.py
-# (Salin kode lengkap 'app2.py' dari respons saya sebelumnya)
-# ... (kode lengkap dari respons sebelumnya ada di sini) ...
 import os
 import pandas as pd
 import numpy as np

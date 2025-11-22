@@ -18,7 +18,7 @@ class TopNavBar extends StatelessWidget {
             ? Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 width: double.infinity,
-                color: isActive ? cs.primary.withOpacity(0.1) : Colors.transparent,
+                color: isActive ? cs.primary.withAlpha(25) : Colors.transparent, // 0.1 opacity
                 child: Text(label, style: TextStyle(color: isActive ? cs.primary : Colors.black87)),
               )
             : Container(
@@ -50,17 +50,17 @@ class TopNavBar extends StatelessWidget {
 
     // Daftar item untuk PopupMenu
     final popupNavItems = [
-      PopupMenuItem(child: navItem('Home', '/', isPopup: true), value: '/'),
-      PopupMenuItem(child: navItem('Jelajahi', '/jelajah', isPopup: true), value: '/jelajah'),
-      PopupMenuItem(child: navItem('Bandingkan', '/bandingkan', isPopup: true), value: '/bandingkan'),
-      PopupMenuItem(child: navItem('Rekomendasi', '/rekomendasi', isPopup: true), value: '/rekomendasi'),
-      PopupMenuItem(child: navItem('AI Assistant', '/ai', isPopup: true), value: '/ai'),
+      PopupMenuItem(value: '/', child: navItem('Home', '/', isPopup: true)),
+      PopupMenuItem(value: '/jelajah', child: navItem('Jelajahi', '/jelajah', isPopup: true)),
+      PopupMenuItem(value: '/bandingkan', child: navItem('Bandingkan', '/bandingkan', isPopup: true)),
+      PopupMenuItem(value: '/rekomendasi', child: navItem('Rekomendasi', '/rekomendasi', isPopup: true)),
+      PopupMenuItem(value: '/ai', child: navItem('AI Assistant', '/ai', isPopup: true)),
     ];
 
     return Material(
       color: Colors.white,
       elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: Colors.black.withAlpha(25), // 0.1 opacity
       child: Container(
         height: 64,
         padding: const EdgeInsets.symmetric(horizontal: 24),

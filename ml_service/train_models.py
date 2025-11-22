@@ -156,4 +156,4 @@ if __name__ == "__main__":
     load_all_benchmarks()
     train_laptop_model()
     train_smartphone_model()
-    print("\n--- [TRAIN] Semua model telah dilatih dan disimpan. ---")fl
+    print("\n--- [TRAIN] Semua model telah dilatih dan disimpan. ---")

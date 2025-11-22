@@ -27,12 +27,12 @@ class GadgetSuggester {
     final int min;
     final int max;
     if (fromJt != null && toJt != null) {
-      min = fromJt! * 1_000_000;
-      max = toJt! * 1_000_000;
+      min = fromJt * 1_000_000;
+      max = toJt * 1_000_000;
     } else if (fromJt != null) {
       // ±1 jt di sekitar angka yang disebut
-      min = (fromJt! - 1) * 1_000_000;
-      max = (fromJt! + 1) * 1_000_000;
+      min = (fromJt - 1) * 1_000_000;
+      max = (fromJt + 1) * 1_000_000;
     } else {
       // default range
       min = 3 * 1_000_000;
@@ -93,7 +93,7 @@ class GadgetSuggester {
 
     final needTxt = needs.isEmpty ? 'umum' : needs.join(', ');
     final btxt = (fromJt != null && toJt != null)
-        ? '~${fromJt}-${toJt} jt'
+        ? '~$fromJt-${toJt} jt'
         : (fromJt == null ? 'kisaran' : '~$fromJt jt');
 
     return 'Oke, kebutuhan: $needTxt, budget: $btxt.\n'

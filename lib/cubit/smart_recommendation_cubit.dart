@@ -1,63 +1,44 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../models/gadget.dart';
-import '../services/gadget_services.dart';
-import '../shared/gadget_suggester.dart';
+import '../models/recommended_product.dart';
+import '../services/recommendation_service.dart';
 
 part 'smart_recommendation_state.dart';
 
 class SmartRecommendationCubit extends Cubit<SmartRecommendationState> {
-  final GadgetService _gadgetService = GadgetService();
+  final RecommendationService _recommendationService = RecommendationService();
 
-  SmartRecommendationCubit() : super(const SmartRecommendationState()) {
-    _loadAndFilterGadgets();
-  }
-
-  Future<void> _loadAndFilterGadgets() async {
-    // Muat data jika belum ada
-    if (state.allGadgetsWithTags.isEmpty) {
-      final allGadgets = await _gadgetService.loadGadgets();
-      final allGadgetsWithTags = allGadgets.map((g) => _WithTags(g, GadgetSuggester.deriveTags(g))).toList();
-      emit(state.copyWith(allGadgetsWithTags: allGadgetsWithTags));
-    }
-    _filterGadgets();
-  }
+  SmartRecommendationCubit() : super(const SmartRecommendationState());
 
   void setType(String type) {
-    emit(state.copyWith(type: type));
-    _filterGadgets();
+    emit(state.copyWith(type: type, status: RecommendationStatus.initial, results: [], comparisonSelection: {}));
   }
 
-  void setBudget(double budget) {
-    emit(state.copyWith(budget: budget));
-    _filterGadgets();
+  void setBudgetRange(double min, double max) {
+    emit(state.copyWith(minBudget: min, maxBudget: max, status: RecommendationStatus.initial));
   }
 
-  void toggleNeed(String need) {
-    final currentNeeds = Set<String>.from(state.needs);
-    if (currentNeeds.contains(need)) {
-      currentNeeds.remove(need);
-    } else {
-      currentNeeds.add(need);
+  Future<void> fetchRecommendations() async {
+    emit(state.copyWith(status: RecommendationStatus.loading, errorMessage: null, comparisonSelection: {}));
+    try {
+      final results = await _recommendationService.getRecommendations(
+        type: state.type,
+        minPrice: state.minBudget * 1000000,
+        maxPrice: state.maxBudget * 1000000,
+      );
+      emit(state.copyWith(status: RecommendationStatus.success, results: results));
+    } catch (e) {
+      emit(state.copyWith(status: RecommendationStatus.failure, errorMessage: e.toString()));
     }
-    emit(state.copyWith(needs: currentNeeds));
-    _filterGadgets();
   }
-
-  void _filterGadgets() {
-    if (state.allGadgetsWithTags.isEmpty) return;
-
-    final min = (state.budget - 1).clamp(1, 100) * 1_000_000;
-    final max = (state.budget + 1) * 1_000_000;
-
-    final filtered = state.allGadgetsWithTags.where((wt) {
-      final g = wt.g;
-      final okType = g.type == state.type;
-      final okBudget = g.price >= min && g.price <= max;
-      final okNeeds = state.needs.isEmpty || state.needs.any((n) => wt.tags.contains(n));
-      return okType && okBudget && okNeeds;
-    }).map((wt) => wt.g).toList(); // Ambil kembali objek Gadget-nya
-
-    emit(state.copyWith(results: filtered));
+  
+  void toggleCompareSelection(RecommendedProduct product) {
+    final newSelection = Set<RecommendedProduct>.from(state.comparisonSelection);
+    if (newSelection.contains(product)) {
+      newSelection.remove(product);
+    } else {
+      newSelection.add(product);
+    }
+    emit(state.copyWith(comparisonSelection: newSelection));
   }
 }

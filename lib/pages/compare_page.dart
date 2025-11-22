@@ -1,101 +1,104 @@
-// lib/pages/compare_page.dart (Update: Integrasi fetchCompare)
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../cubit/compare_cubit.dart';
-import '../models/gadget.dart';
-import '../shared/http_helper.dart';
 import 'package:intl/intl.dart';
+import '../models/recommended_product.dart';
 
 class ComparePage extends StatelessWidget {
-  const ComparePage({super.key});
+  final List<RecommendedProduct> products;
+
+  const ComparePage({super.key, required this.products});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CompareCubit(),
-      child: const CompareView(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Perbandingan Produk'),
+        backgroundColor: const Color(0xFF2c1810),
+        foregroundColor: Colors.white,
+      ),
+      body: products.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.compare_arrows_rounded, size: 64, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Pilih Produk untuk Dibandingkan',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Buka halaman "Rekomendasi Cerdas", cari produk, lalu pilih beberapa item untuk dibandingkan di sini.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamedAndRemoveUntil(context, '/rekomendasi', (route) => false);
+                      },
+                      child: const Text('Buka Rekomendasi'),
+                    )
+                  ],
+                ),
+              ),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: _buildCompareTable(context),
+              ),
+            ),
     );
   }
-}
 
-class CompareView extends StatelessWidget {
-  const CompareView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildCompareTable(BuildContext context) {
     final priceFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
-    final textTheme = Theme.of(context).textTheme;
+    final scoreFormatter = NumberFormat.decimalPattern('id_ID');
 
-    Widget buildImagePlaceholder(Gadget? gadget) {
-      if (gadget == null) {
-        return Container(
-          height: 120,
-          width: 120,
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(child: Icon(Icons.photo_size_select_actual_outlined, color: Colors.grey[400], size: 40)),
-        );
-      }
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(
-          gadget.image,
-          height: 120,
-          width: 120,
-          fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => buildImagePlaceholder(null),
-        ),
-      );
-    }
-
-    final specs = [
-      {'label': 'Nama', 'pick': (Gadget g) => g.name},
-      {'label': 'Harga', 'pick': (Gadget g) => priceFormatter.format(g.price)},
-      {'label': 'Tipe', 'pick': (Gadget g) => g.type},
-      {'label': 'Processor', 'pick': (Gadget g) => g.processor},
-      {'label': 'RAM', 'pick': (Gadget g) => '${g.ramDetails.capacity} ${g.ramDetails.type}${g.ramDetails.speed != null ? ' ${g.ramDetails.speed}' : ''}'},
-      {'label': 'Storage', 'pick': (Gadget g) => g.storage},
-      {'label': 'Layar', 'pick': (Gadget g) => g.screen},
-      {'label': 'Baterai', 'pick': (Gadget g) => g.battery},
-      {'label': 'Kamera', 'pick': (Gadget g) => g.camera},
-      {'label': 'Bobot', 'pick': (Gadget g) => g.weight},
-      {'label': 'Geekbench Single', 'pick': (Gadget g) => g.benchmarks.geekbenchSingle?.toString() ?? '-'},
-      {'label': 'Geekbench Multi', 'pick': (Gadget g) => g.benchmarks.geekbenchMulti?.toString() ?? '-'},
-      {'label': 'GPU', 'pick': (Gadget g) => g.benchmarks.gpuName ?? '-'},
-      {'label': 'VRAM', 'pick': (Gadget g) => g.vram ?? '-'},
+    // Define the rows for the comparison table
+    final rows = [
+      _buildSpecRow('Harga', (p) => priceFormatter.format(p.price)),
+      _buildSpecRow('Prediksi Harga', (p) => priceFormatter.format(p.predictedPrice)),
+      _buildSpecRow('Value Score', (p) => priceFormatter.format(p.valueScore)),
+      if (products.any((p) => p.type == ProductType.laptop))
+        _buildSpecRow('CPU Score', (p) => p.cpuScore != null ? scoreFormatter.format(p.cpuScore) : '-'),
+      if (products.any((p) => p.type == ProductType.laptop))
+        _buildSpecRow('GPU Score', (p) => p.gpuScore != null ? scoreFormatter.format(p.gpuScore) : '-'),
+      if (products.any((p) => p.type == ProductType.smartphone))
+        _buildSpecRow('Chipset Score', (p) => p.chipsetScore != null ? scoreFormatter.format(p.chipsetScore) : '-'),
     ];
 
-    return BlocBuilder<CompareCubit, CompareState>(
-      builder: (context, state) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Perbandingan Gadget', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 12),
-            // Tambah UI untuk pilih gadget A & B (e.g., dropdown/search)
-            FilledButton(
-              onPressed: () async {
-                // Example devices; ganti dengan state.gadgetA/gadgetB
-                final devices = [
-                  {'brand': 'apple', 'device_name': 'iPhone 11'},
-                  {'brand': 'asus', 'device_name': 'Zenbook S 14 OLED'},
-                ];
-                try {
-                  final result = await fetchCompare('smartphone', devices);  // Ganti type jika laptop
-                  // Update cubit with result if needed
-                } catch (e) {
-                  // Handle error
-                }
-              },
-              child: const Text('Bandingkan'),
+    return DataTable(
+      columnSpacing: 24,
+      columns: [
+        const DataColumn(label: Text('Spesifikasi', style: TextStyle(fontWeight: FontWeight.bold))),
+        ...products.map((p) => DataColumn(
+          label: Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(p.productName, style: const TextStyle(fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
+                Image.asset(p.image, height: 60, errorBuilder: (_,__,___) => const SizedBox(height: 60)),
+              ],
             ),
-            const SizedBox(height: 20),
-            // ... (rest of the table code remains the same)
-          ],
-        );
-      },
+          ),
+        )).toList(),
+      ],
+      rows: rows,
+    );
+  }
+
+  DataRow _buildSpecRow(String title, String Function(RecommendedProduct) getValue) {
+    return DataRow(
+      cells: [
+        DataCell(Text(title, style: const TextStyle(fontWeight: FontWeight.w600))),
+        ...products.map((p) => DataCell(Text(getValue(p)))).toList(),
+      ],
     );
   }
 }
