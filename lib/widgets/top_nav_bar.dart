@@ -43,7 +43,6 @@ class TopNavBar extends StatelessWidget {
     final navItems = [
       navItem('Home', '/'),
       navItem('Jelajahi', '/jelajah'),
-      navItem('Bandingkan', '/bandingkan'),
       navItem('Rekomendasi', '/rekomendasi'),
       navItem('AI Assistant', '/ai'),
     ];
@@ -52,7 +51,6 @@ class TopNavBar extends StatelessWidget {
     final popupNavItems = [
       PopupMenuItem(value: '/', child: navItem('Home', '/', isPopup: true)),
       PopupMenuItem(value: '/jelajah', child: navItem('Jelajahi', '/jelajah', isPopup: true)),
-      PopupMenuItem(value: '/bandingkan', child: navItem('Bandingkan', '/bandingkan', isPopup: true)),
       PopupMenuItem(value: '/rekomendasi', child: navItem('Rekomendasi', '/rekomendasi', isPopup: true)),
       PopupMenuItem(value: '/ai', child: navItem('AI Assistant', '/ai', isPopup: true)),
     ];

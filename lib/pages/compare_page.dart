@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../cubit/compare_cubit.dart';
+import '../models/compared_product.dart';
 import '../models/recommended_product.dart';
 
 class ComparePage extends StatelessWidget {
@@ -9,95 +12,105 @@ class ComparePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Perbandingan Produk'),
-        backgroundColor: const Color(0xFF2c1810),
-        foregroundColor: Colors.white,
+    // Membuat Cubit dan langsung memberikan produk yang akan dibandingkan
+    return BlocProvider(
+      create: (context) => CompareCubit(productsToCompare: products),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Hasil Perbandingan Cerdas'),
+          backgroundColor: const Color(0xFF2c1810),
+          foregroundColor: Colors.white,
+        ),
+        body: const ComparisonResultView(),
       ),
-      body: products.isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.compare_arrows_rounded, size: 64, color: Colors.grey),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Pilih Produk untuk Dibandingkan',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Buka halaman "Rekomendasi Cerdas", cari produk, lalu pilih beberapa item untuk dibandingkan di sini.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamedAndRemoveUntil(context, '/rekomendasi', (route) => false);
-                      },
-                      child: const Text('Buka Rekomendasi'),
-                    )
-                  ],
-                ),
-              ),
-            )
-          : SingleChildScrollView(
+    );
+  }
+}
+
+class ComparisonResultView extends StatelessWidget {
+  const ComparisonResultView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CompareCubit, CompareState>(
+      builder: (context, state) {
+        switch (state.status) {
+          case ComparisonStatus.loading:
+            return const Center(child: CircularProgressIndicator());
+          case ComparisonStatus.error:
+            return Center(child: Text('Gagal memuat perbandingan: ${state.errorMessage}'));
+          case ComparisonStatus.loaded:
+            if (state.results.isEmpty) {
+              return const Center(child: Text('Tidak ada data untuk ditampilkan.'));
+            }
+            return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: _buildCompareTable(context),
+                child: _buildComparisonTable(state.results),
               ),
-            ),
+            );
+        }
+      },
     );
   }
 
-  Widget _buildCompareTable(BuildContext context) {
-    final priceFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
-    final scoreFormatter = NumberFormat.decimalPattern('id_ID');
-
-    // Define the rows for the comparison table
+  Widget _buildComparisonTable(List<ComparedProduct> results) {
+    final isLaptop = results.any((p) => p.type == 'laptop');
+    
     final rows = [
-      _buildSpecRow('Harga', (p) => priceFormatter.format(p.price)),
-      _buildSpecRow('Prediksi Harga', (p) => priceFormatter.format(p.predictedPrice)),
-      _buildSpecRow('Value Score', (p) => priceFormatter.format(p.valueScore)),
-      if (products.any((p) => p.type == ProductType.laptop))
-        _buildSpecRow('CPU Score', (p) => p.cpuScore != null ? scoreFormatter.format(p.cpuScore) : '-'),
-      if (products.any((p) => p.type == ProductType.laptop))
-        _buildSpecRow('GPU Score', (p) => p.gpuScore != null ? scoreFormatter.format(p.gpuScore) : '-'),
-      if (products.any((p) => p.type == ProductType.smartphone))
-        _buildSpecRow('Chipset Score', (p) => p.chipsetScore != null ? scoreFormatter.format(p.chipsetScore) : '-'),
+      _buildResultRow('Harga', results.map((r) => r.price).toList()),
+      if (isLaptop) _buildResultRow('Skor CPU', results.map((r) => r.cpuScore).toList()),
+      if (isLaptop) _buildResultRow('Skor GPU', results.map((r) => r.gpuScore).toList()),
+      if (!isLaptop) _buildResultRow('Skor Chipset', results.map((r) => r.chipsetScore).toList()),
     ];
 
     return DataTable(
-      columnSpacing: 24,
       columns: [
-        const DataColumn(label: Text('Spesifikasi', style: TextStyle(fontWeight: FontWeight.bold))),
-        ...products.map((p) => DataColumn(
-          label: Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(p.productName, style: const TextStyle(fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
-                Image.asset(p.image, height: 60, errorBuilder: (_,__,___) => const SizedBox(height: 60)),
-              ],
-            ),
-          ),
-        )).toList(),
+        const DataColumn(label: Text('Metrik', style: TextStyle(fontWeight: FontWeight.bold))),
+        ...results.map((r) => DataColumn(label: Text(r.name, style: const TextStyle(fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis))),
       ],
       rows: rows,
     );
   }
 
-  DataRow _buildSpecRow(String title, String Function(RecommendedProduct) getValue) {
+  DataRow _buildResultRow(String title, List<ComparisonValue?> values) {
+    final formatter = NumberFormat.decimalPattern('id_ID');
     return DataRow(
       cells: [
-        DataCell(Text(title, style: const TextStyle(fontWeight: FontWeight.w600))),
-        ...products.map((p) => DataCell(Text(getValue(p)))).toList(),
+        DataCell(Text(title, style: const TextStyle(fontWeight: FontWeight.w500))),
+        ...values.map((v) {
+          if (v == null) return const DataCell(Text('-'));
+          
+          Color color = Colors.transparent;
+          IconData? icon;
+          if (v.status == 'best') {
+            color = Colors.green.withOpacity(0.1);
+            icon = Icons.check_circle;
+          } else if (v.status == 'worst') {
+            color = Colors.red.withOpacity(0.1);
+            icon = Icons.cancel;
+          }
+
+          return DataCell(
+            Container(
+              color: color,
+              child: Tooltip(
+                message: v.reason,
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (icon != null) Icon(icon, color: color.withOpacity(1), size: 16),
+                      if (icon != null) const SizedBox(width: 4),
+                      Text(formatter.format(v.value)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
       ],
     );
   }

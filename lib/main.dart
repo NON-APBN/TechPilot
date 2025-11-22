@@ -4,7 +4,6 @@ import 'pages/home_page.dart';
 import 'pages/ai_assistant_page.dart';
 import 'pages/smart_recommendation_page.dart';
 import 'pages/browser_page.dart';
-import 'pages/compare_page.dart';
 import 'pages/welcome_page.dart';
 
 void main() {
@@ -69,7 +68,7 @@ class TechPilotApp extends StatelessWidget {
         '/ai': (_) => const Shell(child: AIAssistantPage()),
         '/rekomendasi': (_) => const Shell(child: SmartRecommendationPage()),
         '/jelajah': (_) => const Shell(child: BrowsePage()),
-        '/bandingkan': (_) => const Shell(child: ComparePage(products: [])),
+        // Rute /bandingkan dihapus karena hanya diakses dari /rekomendasi
       },
       onUnknownRoute: (_) => MaterialPageRoute(builder: (_) => const Shell(child: HomePage())),
     );

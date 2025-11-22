@@ -14,6 +14,11 @@ class RecommendedProduct {
   final double? chipsetScore;
   final ProductType type;
 
+  // Data mentah untuk dikirim ke API perbandingan
+  final String? rawCpu;
+  final String? rawGpu;
+  final String? rawChipset;
+
   RecommendedProduct({
     required this.productName,
     required this.price,
@@ -23,6 +28,9 @@ class RecommendedProduct {
     this.gpuScore,
     this.chipsetScore,
     required this.type,
+    this.rawCpu,
+    this.rawGpu,
+    this.rawChipset,
   });
 
   factory RecommendedProduct.fromJson(Map<String, dynamic> json, ProductType type) {
@@ -35,21 +43,13 @@ class RecommendedProduct {
       gpuScore: (json['gpu_score'] as num?)?.toDouble(),
       chipsetScore: (json['chipset_score'] as num?)?.toDouble(),
       type: type,
+      rawCpu: json['cpu'],
+      rawGpu: json['gpu'],
+      rawChipset: json['chipset'],
     );
   }
 
-  // Helper to get the primary score for display
-  double get primaryScore {
-    if (type == ProductType.laptop) {
-      return ((cpuScore ?? 0) + (gpuScore ?? 0));
-    } else if (type == ProductType.smartphone) {
-      return chipsetScore ?? 0;
-    }
-    return 0;
-  }
-
   String get image {
-    // Placeholder logic for images, you can refine this
     if (type == ProductType.laptop) {
       return 'assets/images/laptop_placeholder.png';
     } else {

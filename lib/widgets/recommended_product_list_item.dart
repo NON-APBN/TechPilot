@@ -5,12 +5,14 @@ import '../pages/product_detail_page.dart';
 
 class RecommendedProductListItem extends StatelessWidget {
   final RecommendedProduct product;
+  final int rank;
   final bool isSelected;
   final VoidCallback onSelected;
 
   const RecommendedProductListItem({
     super.key,
     required this.product,
+    required this.rank,
     this.isSelected = false,
     required this.onSelected,
   });
@@ -38,6 +40,12 @@ class RecommendedProductListItem extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
+              // Ranking Number
+              Text(
+                '#$rank',
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
+              ),
+              const SizedBox(width: 8),
               Checkbox(
                 value: isSelected,
                 onChanged: (bool? value) => onSelected(),

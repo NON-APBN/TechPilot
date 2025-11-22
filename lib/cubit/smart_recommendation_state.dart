@@ -4,8 +4,7 @@ enum RecommendationStatus { initial, loading, success, failure }
 
 class SmartRecommendationState extends Equatable {
   final String type;
-  final double minBudget;
-  final double maxBudget;
+  final double targetBudget; // Mengganti min/max dengan satu target
   final RecommendationStatus status;
   final List<RecommendedProduct> results;
   final String? errorMessage;
@@ -13,8 +12,7 @@ class SmartRecommendationState extends Equatable {
 
   const SmartRecommendationState({
     this.type = 'laptop',
-    this.minBudget = 1.0,
-    this.maxBudget = 10.0,
+    this.targetBudget = 5.0, // Default target 5 juta
     this.status = RecommendationStatus.initial,
     this.results = const [],
     this.errorMessage,
@@ -23,8 +21,7 @@ class SmartRecommendationState extends Equatable {
 
   SmartRecommendationState copyWith({
     String? type,
-    double? minBudget,
-    double? maxBudget,
+    double? targetBudget,
     RecommendationStatus? status,
     List<RecommendedProduct>? results,
     String? errorMessage,
@@ -32,8 +29,7 @@ class SmartRecommendationState extends Equatable {
   }) {
     return SmartRecommendationState(
       type: type ?? this.type,
-      minBudget: minBudget ?? this.minBudget,
-      maxBudget: maxBudget ?? this.maxBudget,
+      targetBudget: targetBudget ?? this.targetBudget,
       status: status ?? this.status,
       results: results ?? this.results,
       errorMessage: errorMessage ?? this.errorMessage,
@@ -42,5 +38,5 @@ class SmartRecommendationState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [type, minBudget, maxBudget, status, results, errorMessage, comparisonSelection];
+  List<Object?> get props => [type, targetBudget, status, results, errorMessage, comparisonSelection];
 }

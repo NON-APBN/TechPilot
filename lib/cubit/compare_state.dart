@@ -1,44 +1,30 @@
 part of 'compare_cubit.dart';
 
-@immutable
+enum ComparisonStatus { loading, loaded, error }
+
 class CompareState extends Equatable {
-  final String? selectedType;
-  final String? selectedBrand;
-  final Gadget? gadgetA;
-  final Gadget? gadgetB;
-  final List<String> availableBrands;
-  final List<Gadget> filteredItems;
+  final ComparisonStatus status;
+  final List<ComparedProduct> results;
+  final String? errorMessage;
 
   const CompareState({
-    this.selectedType,
-    this.selectedBrand,
-    this.gadgetA,
-    this.gadgetB,
-    this.availableBrands = const [],
-    this.filteredItems = const [],
+    this.status = ComparisonStatus.loading,
+    this.results = const [],
+    this.errorMessage,
   });
 
   CompareState copyWith({
-    String? selectedType,
-    String? selectedBrand,
-    Gadget? gadgetA,
-    Gadget? gadgetB,
-    List<String>? availableBrands,
-    List<Gadget>? filteredItems,
-    bool forceNullBrand = false,
-    bool forceNullGadgetA = false,
-    bool forceNullGadgetB = false,
+    ComparisonStatus? status,
+    List<ComparedProduct>? results,
+    String? errorMessage,
   }) {
     return CompareState(
-      selectedType: selectedType ?? this.selectedType,
-      selectedBrand: forceNullBrand ? null : selectedBrand ?? this.selectedBrand,
-      gadgetA: forceNullGadgetA ? null : gadgetA ?? this.gadgetA,
-      gadgetB: forceNullGadgetB ? null : gadgetB ?? this.gadgetB,
-      availableBrands: availableBrands ?? this.availableBrands,
-      filteredItems: filteredItems ?? this.filteredItems,
+      status: status ?? this.status,
+      results: results ?? this.results,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
   @override
-  List<Object?> get props => [selectedType, selectedBrand, gadgetA, gadgetB, availableBrands, filteredItems];
+  List<Object?> get props => [status, results, errorMessage];
 }

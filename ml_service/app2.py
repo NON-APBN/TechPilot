@@ -141,7 +141,7 @@ def recommend():
         if data_type == 'laptop':
             if laptop_model is None:
                 return jsonify({"error": "Model laptop (XGBoost) belum dimuat."}), 500
-            name_col = cfg_cols['LAPTOP_NAME']
+            name_col, cpu_col, gpu_col = cfg_cols['LAPTOP_NAME'], cfg_cols['LAPTOP_CPU'], cfg_cols['LAPTOP_GPU']
             valid_rows = filtered_df[(filtered_df['cpu_score'] > 0) & (filtered_df['gpu_score'] > 0)]
             if not valid_rows.empty:
                 X_predict = valid_rows[['cpu_score', 'gpu_score']]
@@ -157,13 +157,15 @@ def recommend():
                         "predicted_price": round(row['predicted_price']),
                         "value_score_rp": round(row['value_score']),
                         "cpu_score": row['cpu_score'],
-                        "gpu_score": row['gpu_score']
+                        "gpu_score": row['gpu_score'],
+                        "cpu": row.get(cpu_col), # Tambahkan nama CPU mentah
+                        "gpu": row.get(gpu_col), # Tambahkan nama GPU mentah
                     })
 
         elif data_type == 'smartphone':
             if smartphone_model is None:
                 return jsonify({"error": "Model smartphone (XGBoost) belum dimuat."}), 500
-            name_col = cfg_cols['HP_NAME']
+            name_col, chipset_col = cfg_cols['HP_NAME'], cfg_cols['HP_CHIPSET']
             valid_rows = filtered_df[filtered_df['chipset_score'] > 0]
             if not valid_rows.empty:
                 X_predict = valid_rows[['chipset_score']]
@@ -178,7 +180,8 @@ def recommend():
                         "price": row['clean_price'],
                         "predicted_price": round(row['predicted_price']),
                         "value_score_rp": round(row['value_score']),
-                        "chipset_score": row['chipset_score']
+                        "chipset_score": row['chipset_score'],
+                        "chipset": row.get(chipset_col), # Tambahkan nama Chipset mentah
                     })
 
         return jsonify({
@@ -186,6 +189,61 @@ def recommend():
             "range_price": f"{min_price} - {max_price}",
             "results": results
         })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/compare', methods=['POST'])
+def compare():
+    try:
+        data = request.json
+        products = data.get('products', [])
+        if not products or len(products) < 2:
+            return jsonify({"error": "Minimal 2 produk diperlukan untuk perbandingan."}), 400
+
+        # Tambahkan skor benchmark ke setiap produk
+        for p in products:
+            if p.get('type') == 'laptop':
+                p['cpu_score'] = cpu_scores_map.get(clean_name(p.get('cpu')), 0)
+                p['gpu_score'] = gpu_scores_map.get(clean_name(p.get('gpu')), 0)
+            elif p.get('type') == 'smartphone':
+                p['chipset_score'] = chipset_scores_map.get(clean_name(p.get('chipset')), 0)
+
+        # Fungsi untuk membandingkan dan memberi anotasi
+        def annotate_comparison(products, key, name, is_higher_better=True):
+            scores = [p.get(key, 0) for p in products]
+            if not any(scores): return
+
+            max_score = max(scores)
+            min_score = min(scores)
+
+            if max_score == min_score: # Jika semua skor sama
+                for p in products:
+                    p[key] = {'value': p.get(key, 0), 'status': 'neutral', 'reason': f'Sama dengan produk lain.'}
+                return
+
+            for p in products:
+                score = p.get(key, 0)
+                status = 'neutral'
+                reason = ''
+                if (is_higher_better and score == max_score) or (not is_higher_better and score == min_score):
+                    status = 'best'
+                    reason = f'Terbaik di kategori {name}.'
+                elif (is_higher_better and score == min_score) or (not is_higher_better and score == max_score):
+                    status = 'worst'
+                    reason = f'Paling rendah di kategori {name}.'
+                
+                p[key] = {'value': score, 'status': status, 'reason': reason}
+
+        # Lakukan perbandingan untuk setiap metrik
+        annotate_comparison(products, 'price', 'Harga', is_higher_better=False)
+        if products[0].get('type') == 'laptop':
+            annotate_comparison(products, 'cpu_score', 'Performa CPU')
+            annotate_comparison(products, 'gpu_score', 'Performa Grafis')
+        elif products[0].get('type') == 'smartphone':
+            annotate_comparison(products, 'chipset_score', 'Performa Chipset')
+
+        return jsonify({"results": products})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -26,7 +26,7 @@ class SmartRecommendationView extends StatelessWidget {
       children: const [
         Text('Rekomendasi Cerdas', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         SizedBox(height: 8),
-        Text('Dapatkan rekomendasi produk terbaik berdasarkan performa dan harga dari model AI kami.', style: TextStyle(fontSize: 14, color: Colors.grey)),
+        Text('Pilih target harga, dan biarkan AI kami menemukan produk dengan nilai terbaik untuk Anda.', style: TextStyle(fontSize: 14, color: Colors.grey)),
         SizedBox(height: 20),
         FilterControls(),
         SizedBox(height: 24),
@@ -42,21 +42,13 @@ class FilterControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SmartRecommendationCubit, SmartRecommendationState>(
-      buildWhen: (p, c) => p.type != c.type || p.minBudget != c.minBudget || p.maxBudget != c.maxBudget,
+      buildWhen: (p, c) => p.type != c.type || p.targetBudget != c.targetBudget,
       builder: (context, state) {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withAlpha(25), // 0.1 opacity
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 3),
-              ),
-            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,28 +66,19 @@ class FilterControls extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Budget Range Selection
-              const Text('Rentang Budget', style: TextStyle(fontWeight: FontWeight.w600)),
-              RangeSlider(
-                values: RangeValues(state.minBudget, state.maxBudget),
+              // Target Budget Slider
+              const Text('Target Harga', style: TextStyle(fontWeight: FontWeight.w600)),
+              Slider(
+                value: state.targetBudget,
                 min: 1,
                 max: 50,
                 divisions: 49,
-                labels: RangeLabels(
-                  '${state.minBudget.toStringAsFixed(0)} jt',
-                  '${state.maxBudget.toStringAsFixed(0)} jt',
-                ),
-                onChanged: (values) {
-                  context.read<SmartRecommendationCubit>().setBudgetRange(values.start, values.end);
+                label: 'Rp ${state.targetBudget.toStringAsFixed(0)} jt',
+                onChanged: (value) {
+                  context.read<SmartRecommendationCubit>().setTargetBudget(value);
                 },
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Rp ${state.minBudget.toStringAsFixed(0)} jt'),
-                  Text('Rp ${state.maxBudget.toStringAsFixed(0)} jt'),
-                ],
-              ),
+              Center(child: Text('Sekitar Rp ${state.targetBudget.toStringAsFixed(0)} jutaan', style: const TextStyle(fontSize: 16))),
               const SizedBox(height: 24),
 
               // Action Button
@@ -131,7 +114,7 @@ class RecommendationResults extends StatelessWidget {
 
         return Column(
           children: [
-            if (selection.isNotEmpty)
+            if (selection.length >= 2)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: ElevatedButton.icon(
@@ -160,7 +143,7 @@ class RecommendationResults extends StatelessWidget {
         return const Center(
           child: Padding(
             padding: EdgeInsets.all(32.0),
-            child: Text('Atur filter dan klik "Cari Rekomendasi" untuk memulai.', textAlign: TextAlign.center),
+            child: Text('Atur target harga dan klik "Cari Rekomendasi" untuk memulai.', textAlign: TextAlign.center),
           ),
         );
       case RecommendationStatus.loading:
@@ -178,7 +161,7 @@ class RecommendationResults extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(32.0),
-              child: Text('Tidak ada produk yang ditemukan untuk kriteria Anda. Coba ubah rentang budget.', textAlign: TextAlign.center),
+              child: Text('Tidak ada produk yang ditemukan di sekitar target harga ini.', textAlign: TextAlign.center),
             ),
           );
         }
@@ -191,6 +174,7 @@ class RecommendationResults extends StatelessWidget {
             final isSelected = state.comparisonSelection.contains(product);
             return RecommendedProductListItem(
               product: product,
+              rank: i + 1, // Tambahkan peringkat
               isSelected: isSelected,
               onSelected: () => context.read<SmartRecommendationCubit>().toggleCompareSelection(product),
             );
