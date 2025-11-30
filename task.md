@@ -9,8 +9,8 @@
 - [x] Deploy to Vercel (User Action) <!-- id: 6 -->
     - [x] Build Flutter Web <!-- id: 7 -->
     - [x] Upload to Vercel (Manual/Dashboard) <!-- id: 8 -->
-- [/] Migrate to Hugging Face Spaces <!-- id: 9 -->
-    - [ ] Create `Dockerfile.ml` <!-- id: 10 -->
-    - [ ] Create `Dockerfile.backend` <!-- id: 11 -->
-    - [ ] Create `MIGRATION_HF.md` <!-- id: 12 -->
+- [/] Migrate to Hugging Face Spaces (Manual Upload Strategy) <!-- id: 9 -->
+    - [x] Create `Dockerfile.ml` (Ready for upload) <!-- id: 10 -->
+    - [x] Create `Dockerfile.backend` (Ready for upload) <!-- id: 11 -->
+    - [x] Create `MIGRATION_HF.md` (Updated with manual steps) <!-- id: 12 -->
     - [ ] Update Flutter Config (Post-Migration) <!-- id: 13 -->

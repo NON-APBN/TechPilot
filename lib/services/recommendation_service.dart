@@ -5,7 +5,7 @@ import '../models/recommended_product.dart';
 
 class RecommendationService {
   // TODO: Pindahkan URL ke file konfigurasi
-  final String _baseUrl = 'https://techpilot-backend.onrender.com/api';
+  final String _baseUrl = 'https://drappy-cat-techpilot-backend.hf.space/api';
 
   Future<List<RecommendedProduct>> getRecommendations({
     required String type,

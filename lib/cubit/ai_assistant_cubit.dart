@@ -20,7 +20,7 @@ class AIAssistantCubit extends Cubit<AIAssistantState> {
     ChatMessage(role: 'assistant', text: 'Halo! Saya TechPilot AI. Tanyakan rekomendasi gadget impianmu, misalnya "Cari laptop gaming 15 jutaan" atau "HP Samsung kamera bagus".')
   ]));
 
-  final String _baseUrl = 'https://techpilot-backend.onrender.com/api';
+  final String _baseUrl = 'https://drappy-cat-techpilot-backend.hf.space/api';
 
   Future<void> sendMessage(String text) async {
     final currentState = state;

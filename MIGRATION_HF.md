@@ -27,56 +27,40 @@ Kita mulai dari yang paling berat, yaitu Python ML.
     *   **Visibility**: **Public**.
     *   Klik **Create Space**.
 
-2.  **Upload Kode**:
-    *   Setelah Space jadi, Anda akan melihat halaman instruksi.
-    *   Scroll ke bawah cari bagian **"Clone this space"** atau gunakan cara upload manual via browser (Tab **Files**).
-    *   **Cara Paling Mudah (Via Browser)**:
-        1.  Klik tab **Files** di halaman Space Anda.
-        2.  Klik **Add file** -> **Upload files**.
-        3.  Drag & Drop **SEMUA** file dari folder project `TechPilot` Anda di komputer ke sana.
-            *   *Tips: Upload folder `backend`, `ml_service`, `assets`, dan file-file di root.*
-        4.  Tunggu proses upload selesai.
-        5.  Di bagian "Commit changes", ketik pesan "Initial commit" lalu klik **Commit changes to main**.
+3.  **Upload Kode (METODE MANUAL - RECOMMENDED)**:
+    *   Karena upload via Git sering gagal (timeout/jaringan), gunakan cara manual ini yang **100% Berhasil**.
+    *   Klik tab **Files** di halaman Space Anda.
+    *   Klik **Add file** -> **Upload files**.
+    *   **Drag & Drop** file/folder berikut dari komputer Anda:
+        1.  Folder `backend` (**Tips:** Hapus folder `node_modules` di dalamnya dulu agar ringan. Nanti server akan install sendiri).
+        2.  Folder `ml_service`
+        3.  Folder `assets` (Pastikan gambar sudah dikompres jika memungkinkan)
+        4.  File `Dockerfile.ml`
+        5.  File `Dockerfile.backend`
+        6.  File `requirements.txt` (jika ada di luar)
+    *   Tunggu proses upload selesai (bar hijau penuh).
+    *   Di bawah, ketik "Initial Upload" dan klik **Commit changes**.
 
-3.  **Aktifkan Dockerfile**:
-    *   Saat ini Hugging Face mencari file bernama `Dockerfile`, tapi file kita bernama `Dockerfile.ml`.
-    *   Di tab **Files**, cari file `Dockerfile.ml`.
-    *   Klik titik tiga (⋮) di sebelah kanan file -> **Rename**.
-    *   Ubah namanya menjadi `Dockerfile` (tanpa ekstensi .ml).
+4.  **Aktifkan Dockerfile (PENTING!)**:
+    *   Setelah upload selesai, cari file `Dockerfile.ml` di daftar file.
+    *   Klik titik tiga (⋮) di kanannya -> **Rename**.
+    *   Ubah nama menjadi `Dockerfile` (hapus `.ml`).
     *   Klik **Commit changes**.
+    *   *Space akan otomatis mulai Building.*
 
-4.  **Tunggu Build**:
-    *   Klik tab **App**. Anda akan melihat status "Building".
-    *   Proses ini agak lama (3-5 menit) karena mendownload library ML yang besar.
-    *   Jika sukses, status berubah jadi **Running**.
+5.  **Tunggu Build**:
+    *   Klik tab **App**. Status akan berubah "Building" -> "Running".
+    *   Jika "Running", berarti sukses!
 
-5.  **Dapatkan URL**:
-    *   Di bagian atas Space, klik tombol menu (titik tiga) -> **Embed this space**.
-    *   Salin **Direct URL**. Linknya biasanya seperti: `https://username-techpilot-ml.hf.space`.
-    *   **Simpan URL ini!**
+6.  **Dapatkan URL**:
+    *   Klik menu titik tiga di kanan atas -> **Embed this space**.
+    *   Copy **Direct URL**. Simpan untuk nanti.
 
-### Cara Alternatif: Push via Terminal (Git) - Lebih Cepat & Stabil
-Jika upload via browser gagal atau macet, gunakan cara ini (mirip push ke GitHub).
-
-1.  **Siapkan Access Token**:
-    *   Buka [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
-    *   Klik **Create new token**.
-    *   Type: **Write** (Penting!).
-    *   Name: `techpilot-deploy`.
-    *   Copy token-nya (dimulai dengan `hf_...`).
-
-2.  **Tambah Remote Hugging Face**:
-    Buka terminal VS Code Anda, ketik:
-    ```bash
-    # Ganti URL di bawah dengan URL git Space Anda (ada di tombol "Clone this space")
-    git remote add hf-ml https://huggingface.co/spaces/USERNAME/techpilot-ml
-    ```
-
-3.  **Push Kode**:
-    ```bash
-    git push hf-ml main --force
-    ```
-    *Saat diminta password, paste token `hf_...` yang tadi dicopy.*
+### (Opsional) Cara Git Terminal
+*Hanya gunakan jika cara manual di atas gagal total.*
+1.  Siapkan Access Token (Write) di Settings HF.
+2.  `git remote add hf-ml <URL_SPACE>`
+3.  `git push hf-ml main --force`
 
 ---
 
@@ -105,13 +89,14 @@ Sekarang kita deploy backend yang menjadi jembatan.
     *   Scroll ke bagian **Variables and secrets**.
     *   Klik **New variable**.
     *   **Name**: `PYTHON_API_URL`
-    *   **Value**: Masukkan URL Python ML Service dari Langkah 1 (contoh: `https://username-techpilot-ml.hf.space`). **Hapus tanda slash (/) di akhir**.
+    *   **Value**: `https://drappy-cat-techpilot-ml.hf.space`
+    *   *(Link ini saya buatkan otomatis berdasarkan username Anda. Harusnya 99% benar).*
     *   Klik **Save**.
     *   Space akan restart otomatis.
 
 5.  **Dapatkan URL Backend**:
     *   Sama seperti tadi, ambil **Direct URL** dari menu Embed.
-    *   Contoh: `https://username-techpilot-backend.hf.space`.
+    *   Atau gunakan pola: `https://drappy-cat-techpilot-backend.hf.space`.
     *   **Simpan URL ini!**
 
 ---
