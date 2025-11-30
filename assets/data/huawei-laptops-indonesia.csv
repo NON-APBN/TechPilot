@@ -1,0 +1,18 @@
+year,category,series,model,sku_example,cpu,gpu,display,ram,storage,weight_kg,price_idr,price_usd,refresh_rate_hz,panel_type,npu_ai_tops,source,material
+2024,Premium,MateBook X Pro,MateBook X Pro 2024,HUAWEI-MBX-PRO-2024,Intel Core Ultra 9 185H,Intel Arc Graphics,"14.2"" 3120x2080",32GB,2TB SSD,0.98,34999000,2333,120,OLED,Intel AI Boost NPU,consumer.huawei.com,Metal
+2024,Mainstream,MateBook 14,MateBook 14 Core Ultra 5,HUAWEI-MB14-CU5-2024,Intel Core Ultra 5,Intel Arc Graphics,"14.2"" 2880x1920 (2.8K)",16GB,1TB SSD,1.31,15999000,1067,120,OLED,,consumer.huawei.com,Metal
+2024,Mainstream,MateBook 14,MateBook 14 Core Ultra 7,HUAWEI-MB14-CU7-2024,Intel Core Ultra 7,Intel Arc Graphics,"14.2"" 2880x1920 (2.8K)",16GB,1TB SSD,1.31,17999000,1200,120,OLED,,consumer.huawei.com,Metal
+2024,Mainstream,MateBook D14,MateBook D14 2024 i5-12450H,HUAWEI-MBD14-12450H,Intel Core i5-12450H,Intel Iris Xe Graphics,"14"" 1920x1200",8GB,512GB SSD,1.39,8999000,600,60,IPS,,consumer.huawei.com,Metal
+2024,Mainstream,MateBook D14,MateBook D14 2024 i5-13420H,HUAWEI-MBD14-13420H,Intel Core i5-13420H,Intel Iris Xe Graphics,"14"" 1920x1200",16GB,512GB SSD,1.39,10799000,720,60,IPS,,consumer.huawei.com,Metal
+2023,Mainstream,MateBook D14,MateBook D14 2023 i5-1240P,HUAWEI-MBD14-1240P,Intel Core i5-1240P,Intel Iris Xe Graphics,"14"" 1920x1200",8GB,512GB SSD,1.38,10000000,667,60,IPS,,consumer.huawei.com,Metal
+2023,Mainstream,MateBook D14,MateBook D14 2023 i3-1215U,HUAWEI-MBD14-1215U,Intel Core i3-1215U,Intel UHD Graphics,"14"" 1920x1200",8GB,512GB SSD,1.38,7399000,493,60,IPS,,consumer.huawei.com,Metal
+2024,Mainstream,MateBook D16,MateBook D16 2024 i5-13420H,HUAWEI-MBD16-13420H,Intel Core i5-13420H,Intel UHD Graphics,"16"" 1920x1200",16GB,1TB SSD,1.68,12999000,867,60,IPS,,consumer.huawei.com,Metal
+2024,Mainstream,MateBook D16,MateBook D16 2024 i9-13900H,HUAWEI-MBD16-13900H,Intel Core i9-13900H,Intel Iris Xe Graphics,"16"" 1920x1200",16GB,1TB SSD,1.68,17999000,1200,60,IPS,,consumer.huawei.com,Metal
+2022,Mainstream,MateBook D16,MateBook D16 2022 i5-12450H,HUAWEI-MBD16-12450H,Intel Core i5-12450H,Intel UHD Graphics,"16"" 1920x1200",16GB,512GB SSD,1.7,13999000,933,60,IPS,,consumer.huawei.com,Metal
+2022,Mainstream,MateBook D16,MateBook D16 2022 i7-12700H,HUAWEI-MBD16-12700H,Intel Core i7-12700H,Intel Iris Xe Graphics,"16"" 1920x1200",16GB,512GB SSD,1.7,16999000,1133,60,IPS,,consumer.huawei.com,Metal
+2021,Mainstream,MateBook D15,MateBook D15 2021 i5-1135G7,HUAWEI-MBD15-1135G7,Intel Core i5-1135G7,Intel Iris Xe Graphics,"15.6"" 1920x1080",8GB,512GB SSD,1.53,9999000,667,60,IPS,,consumer.huawei.com,Metal
+2021,Mainstream,MateBook D15,MateBook D15 2021 i3-10110U,HUAWEI-MBD15-10110U,Intel Core i3-10110U,Intel UHD Graphics,"15.6"" 1920x1080",8GB,256GB SSD,1.53,8999000,600,60,IPS,,consumer.huawei.com,Metal
+2020,Mainstream,MateBook D15,MateBook D15 Ryzen 5 3500U,HUAWEI-MBD15-R5,AMD Ryzen 5 3500U,AMD Radeon Vega 8,"15.6"" 1920x1080",8GB,256GB SSD,1.53,8699000,580,60,IPS,,consumer.huawei.com,Metal
+2021,Mainstream,MateBook D15,MateBook D15 2021 Ryzen 7-5700U,HUAWEI-MBD15-R7,AMD Ryzen 7 5700U,AMD Radeon Graphics,"15.6"" 1920x1080",8GB,512GB SSD,1.53,9999000,667,60,IPS,,consumer.huawei.com,Metal
+2023,Premium,MateBook 14s,MateBook 14s i7-11370H,HUAWEI-MB14S-11370H,Intel Core i7-11370H,Intel Iris Xe Graphics,"14.2"" 2520x1680",16GB,1TB SSD,1.43,21900000,1460,60,LTPS LCD,,consumer.huawei.com,Metal
+2021,Mainstream,MateBook D14,MateBook D14 2021 i5-10210U,HUAWEI-MBD14-10210U,Intel Core i5-10210U,Intel UHD Graphics,"14"" 1920x1080",8GB,512GB SSD,1.38,10000000,667,60,IPS,,consumer.huawei.com,Metal

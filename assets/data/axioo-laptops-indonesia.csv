@@ -1,0 +1,36 @@
+year,category,series,model,sku_example,cpu,gpu,display,ram,storage,weight_kg,price_idr,price_usd,refresh_rate_hz,panel_type,npu_ai_tops,source,material
+2024,Premium Gaming,Pongo Studio,Pongo Studio X,AXIOO-PONGO-STUDIO-X,Intel Core i9-13900HX,NVIDIA GeForce RTX 4070 8GB,"16"" 2560x1600 (QHD+)",32GB,1TB SSD,2.1,29999000,2000,240,IPS,,axiooworld.com,Metal
+2024,Gaming,Pongo 960,Pongo 960,AXIOO-PONGO-960,Intel Core i9-13900H,NVIDIA GeForce RTX 4060 8GB,"15.6"" 1920x1080",16GB,512GB SSD,2.0,18300000,1220,144,IPS,,axiooworld.com,Plastic
+2025,Gaming,Pongo 760,Pongo 760 v2,AXIOO-PONGO-760-V2,Intel Core i7-13620H,NVIDIA GeForce RTX 4060 8GB,"15.6"" 1920x1080",16GB,512GB SSD,1.99,16249000,1083,144,IPS,,axiooworld.com,Plastic
+2024,Gaming,Pongo 760,Pongo 760,AXIOO-PONGO-760,Intel Core i7-12650H,NVIDIA GeForce RTX 4060 8GB,"15.6"" 1920x1080",16GB,512GB SSD,1.99,15699000,1047,144,IPS,,axiooworld.com,Plastic
+2024,Gaming,Pongo 775,Pongo 775,AXIOO-PONGO-775,Intel Core i7-13620H,NVIDIA GeForce RTX 3050 6GB,"15.6"" 1920x1080",16GB,512GB SSD,1.99,13999000,933,144,IPS,,axiooworld.com,Plastic
+2024,Gaming,Pongo 750,Pongo 750,AXIOO-PONGO-750,Intel Core i7-13620H,NVIDIA GeForce RTX 4050 6GB,"15.6"" 1920x1080",16GB,512GB SSD,1.99,12500000,833,144,IPS,,axiooworld.com,Plastic
+2024,Gaming,Pongo 735,Pongo 735,AXIOO-PONGO-735,Intel Core i7-13620H,NVIDIA GeForce RTX 3050 6GB,"15.6"" 1920x1080",16GB,512GB SSD,1.99,11999000,800,144,IPS,,axiooworld.com,Plastic
+2023,Gaming,Pongo 725,Pongo 725,AXIOO-PONGO-725,Intel Core i7-12650H,NVIDIA GeForce RTX 2050 4GB,"15.6"" 1920x1080",16GB,512GB SSD,1.99,10499000,700,144,IPS,,axiooworld.com,Plastic
+2024,Mainstream,MyBook Z10 Metal,MyBook Z10 Metal i5 16GB,AXIOO-Z10-I5-16GB,Intel Core i5-1335U,Intel Iris Xe Graphics,"14"" 1920x1080",16GB,1TB SSD,1.4,9399000,627,60,IPS,,axiooworld.com,Metal
+2024,Mainstream,MyBook Z10 Metal,MyBook Z10 Metal i5 16GB 512GB,AXIOO-Z10-I5-16-512,Intel Core i5-1335U,Intel Iris Xe Graphics,"14"" 1920x1080",16GB,512GB SSD,1.4,8999000,600,60,IPS,,axiooworld.com,Metal
+2024,Mainstream,MyBook Z10 Metal,MyBook Z10 Metal i5 8GB,AXIOO-Z10-I5-8GB,Intel Core i5-1335U,Intel Iris Xe Graphics,"14"" 1920x1080",8GB,256GB SSD,1.4,8399000,560,60,IPS,,axiooworld.com,Metal
+2024,Mainstream,MyBook SAGA,MyBook SAGA 12 8GB,AXIOO-SAGA-12-8GB,Intel Core i5-12450H,Intel Iris Xe Graphics,"16"" 2560x1600",8GB,256GB SSD,1.75,8399000,560,60,IPS,,axiooworld.com,Metal
+2024,Mainstream,MyBook SAGA,MyBook SAGA 10 16GB,AXIOO-SAGA-10-16GB,Intel Core i5-1235U,Intel Iris Xe Graphics,"16"" 2560x1600",16GB,512GB SSD,1.75,7399000,493,60,IPS,,axiooworld.com,Metal
+2024,Mainstream,MyBook Pro,MyBook Pro X7,AXIOO-PRO-X7,AMD Ryzen 7-5825U,AMD Radeon Graphics,"14"" 1920x1080",16GB,512GB SSD,1.4,7899000,527,60,IPS,,axiooworld.com,Metal
+2024,Mainstream,MyBook Pro,MyBook Pro X5,AXIOO-PRO-X5,AMD Ryzen 5-5625U,AMD Radeon Graphics,"14"" 1920x1080",8GB,256GB SSD,1.4,7800000,520,60,IPS,,axiooworld.com,Metal
+2024,Mainstream,MyBook Z6,MyBook Z6 Metal 16GB,AXIOO-Z6-METAL-16GB,Intel Core i3-1215U,Intel UHD Graphics,"14"" 1920x1080",16GB,512GB SSD,1.4,6899000,460,60,IPS,,axiooworld.com,Metal
+2024,Mainstream,MyBook SAGA,MyBook SAGA 10 8GB,AXIOO-SAGA-10-8GB,Intel Core i5-1235U,Intel Iris Xe Graphics,"16"" 2560x1600",8GB,256GB SSD,1.75,6699000,447,60,IPS,,axiooworld.com,Metal
+2024,Mainstream,MyBook Z6,MyBook Z6 16GB,AXIOO-Z6-16GB,Intel Core i3-1215U,Intel UHD Graphics,"14"" 1920x1080",16GB,512GB SSD,1.4,6499000,433,60,IPS,,axiooworld.com,Plastic
+2024,Mainstream,MyBook Z6,MyBook Z6 Metal 8GB,AXIOO-Z6-METAL-8GB,Intel Core i3-1215U,Intel UHD Graphics,"14"" 1920x1080",8GB,256GB SSD,1.4,5999000,400,60,IPS,,axiooworld.com,Metal
+2024,Budget,MyBook Hype,MyBook Hype JKT48 Special Edition,AXIOO-HYPE-JKT48,Intel Core i3-1215U,Intel UHD Graphics,"14"" 1920x1080",16GB,512GB SSD,1.6,5900000,393,60,IPS,,axiooworld.com,Plastic
+2024,Mainstream,MyBook Hype,MyBook Hype 7 AMD X7,AXIOO-HYPE-7-X7,AMD Ryzen 7-5825U,AMD Radeon Vega 8,"14"" 1920x1080",16GB,512GB SSD,1.4,7000000,467,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook Hype,MyBook Hype 5 16GB,AXIOO-HYPE-5-16GB,Intel Core i5-1035G4,Intel Iris Plus Graphics,"14"" 1920x1080",16GB,512GB SSD,1.4,5849000,390,60,IPS,,axiooworld.com,Plastic
+2024,Mainstream,MyBook Z6,MyBook Z6 8GB,AXIOO-Z6-8GB,Intel Core i3-1215U,Intel UHD Graphics,"14"" 1920x1080",8GB,256GB SSD,1.4,5599000,373,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook Hype,MyBook Hype 5 8GB,AXIOO-HYPE-5-8GB,Intel Core i5-1035G4,Intel Iris Plus Graphics,"14"" 1920x1080",8GB,512GB SSD,1.4,5549000,370,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook Hype,MyBook Hype 5 AMD X6,AXIOO-HYPE-5-X6,AMD Ryzen 5-6600H,AMD Radeon Graphics,"14"" 1920x1080",16GB,512GB SSD,1.4,5699000,380,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook Hype,MyBook Hype 5 AMD X5,AXIOO-HYPE-5-X5,AMD Ryzen 5-5625U,AMD Radeon Graphics,"14"" 1920x1080",16GB,512GB SSD,1.4,5499000,367,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook Hype,MyBook Hype 5 AMD X3,AXIOO-HYPE-5-X3,AMD Ryzen 5-3500U,AMD Radeon Vega 8,"14"" 1920x1080",8GB,256GB SSD,1.4,4599000,307,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook Hype,MyBook Hype 3,AXIOO-HYPE-3,Intel Core i3-1005G1,Intel UHD Graphics,"14"" 1920x1080",8GB,256GB SSD,1.4,3999000,267,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook 14F,MyBook 14F,AXIOO-14F,Intel Celeron N4020,Intel UHD Graphics 600,"14"" 2560x1440",4GB,128GB SSD,1.38,2724000,182,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook Hype,MyBook Hype 1,AXIOO-HYPE-1,Intel Celeron N4020,Intel UHD Graphics 600,"14"" 1366x768",4GB,128GB SSD,1.4,2499000,167,60,TN,,axiooworld.com,Plastic
+2024,Budget,MyBook 11G,MyBook 11G 6GB,AXIOO-11G-6GB,Intel Celeron N4020,Intel UHD Graphics 600,"11.6"" 1920x1080",6GB,256GB SSD,1.1,2574000,172,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook 11G,MyBook 11G 4GB,AXIOO-11G-4GB,Intel Celeron N4020,Intel UHD Graphics 600,"11.6"" 1920x1080",4GB,256GB SSD,1.1,2299000,153,60,IPS,,axiooworld.com,Plastic
+2023,Mainstream,Aerobook,Aerobook i5,AXIOO-AEROBOOK-I5,Intel Core i5-4200U,Intel HD Graphics 4400,"13.3"" 1366x768",4GB,256GB SSD,1.4,5500000,367,60,TN,,axiooworld.com,Metal
+2024,Budget,SlimBook,SlimBook 13,AXIOO-SLIMBOOK-13,Intel Celeron N4020,Intel UHD Graphics 600,"13.3"" 1920x1080",4GB,128GB SSD,1.3,3500000,233,60,IPS,,axiooworld.com,Plastic
+2024,Budget,MyBook Lite,MyBook Lite 11,AXIOO-LITE-11,Intel Celeron N4020,Intel UHD Graphics 600,"11.6"" 1366x768",4GB,128GB eMMC,1.1,2500000,167,60,TN,,axiooworld.com,Plastic

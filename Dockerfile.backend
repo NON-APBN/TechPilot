@@ -1,0 +1,26 @@
+# Gunakan Node.js 18 Slim
+FROM node:18-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json dari folder backend
+COPY backend/package.json backend/package.json
+
+# Install dependencies
+WORKDIR /app/backend
+RUN npm install
+
+# Copy seluruh kode project
+WORKDIR /app
+COPY . .
+
+# Expose port 7860 (Default Hugging Face)
+EXPOSE 7860
+
+# Set environment variable
+ENV PORT=7860
+
+# Jalankan server
+WORKDIR /app/backend
+CMD ["node", "server.js"]
