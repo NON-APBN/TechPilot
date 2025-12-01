@@ -29,8 +29,15 @@ class ProductDataService {
 
     for (final file in files) {
       try {
-        final data = await rootBundle.loadString('backend/data/$file');
-        final List<List<dynamic>> csvTable = const CsvToListConverter().convert(data);
+        // Try loading with 'assets/' prefix first (common for Web)
+        String content;
+        try {
+          content = await rootBundle.loadString('assets/backend/data/$file');
+        } catch (e) {
+          // Fallback to original path
+          content = await rootBundle.loadString('backend/data/$file');
+        }
+        final List<List<dynamic>> csvTable = const CsvToListConverter().convert(content);
 
         // Skip header
         for (var i = 1; i < csvTable.length; i++) {
@@ -76,8 +83,13 @@ class ProductDataService {
         : 'ALL_SMARTPHONES_MERGED.csv';
 
     try {
-      final String data = await rootBundle.loadString('backend/data/$fileName');
-      final List<List<dynamic>> csvTable = const CsvToListConverter().convert(data);
+      String content;
+      try {
+        content = await rootBundle.loadString('assets/backend/data/$fileName');
+      } catch (e) {
+        content = await rootBundle.loadString('backend/data/$fileName');
+      }
+      final List<List<dynamic>> csvTable = const CsvToListConverter().convert(content);
 
       if (csvTable.isEmpty) return [];
 
