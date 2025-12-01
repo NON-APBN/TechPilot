@@ -29,16 +29,33 @@ processed_data_cache = {}
 def robust_price_cleaner(series):
     """
     Fungsi pembersihan harga yang tangguh untuk menangani berbagai format.
-    Handles: 15000000.0, "15.000.000", "Rp15,000,000", etc.
+    Handles: 15000000.0 (float), 15000000 (int), "15.000.000" (IDR str), "15000000" (str)
     """
-    # 1. Ubah ke string
-    s = series.astype(str)
-    # 2. Hapus semua karakter non-numerik
-    s = s.str.replace(r'[^0-9]', '', regex=True)
-    # 3. Konversi ke angka, jika error jadikan NaN
-    s = pd.to_numeric(s, errors='coerce')
-    # 4. Isi sisa NaN dengan 0 dan ubah ke integer
-    return s.fillna(0).astype(np.int64)
+    def clean_single(val):
+        if pd.isna(val) or val == '':
+            return 0
+        
+        # 1. Jika sudah numerik, return langsung
+        if isinstance(val, (int, float, np.number)):
+            return int(val)
+            
+        val_str = str(val).strip()
+        
+        # 2. Cek format IDR dengan 'Rp' atau titik sebagai pemisah ribuan
+        # Asumsi: jika ada titik lebih dari satu, atau pola 'xxx.xxx', itu ribuan IDR
+        if 'rp' in val_str.lower() or val_str.count('.') > 1:
+             cleaned = re.sub(r'[^\d]', '', val_str) # Hapus semua kecuali angka
+             return int(cleaned) if cleaned else 0
+        
+        # 3. Handle float string "25000.0" -> pastikan tidak menghapus titik decimal
+        try:
+            return int(float(val_str))
+        except ValueError:
+            # Fallback terakhir, ambil digit saja
+            cleaned = re.sub(r'[^\d]', '', val_str)
+            return int(cleaned) if cleaned else 0
+
+    return series.apply(clean_single)
 
 def get_processed_data(data_type='laptop'):
     """

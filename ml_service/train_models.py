@@ -148,8 +148,28 @@ def load_prep_data(data_type='laptop'):
     df = pd.read_csv(csv_path)
     
     if price_col in df.columns:
-        df['clean_price'] = df[price_col].astype(str).str.replace(r'[Rp,.]', '', regex=True)
-        df['clean_price'] = pd.to_numeric(df['clean_price'], errors='coerce').fillna(0)
+        # FUNGSI MEMBERSIHKAN HARGA YANG LEBIH AMAN
+        def safe_clean_price(val):
+            if pd.isna(val): return 0
+            # Jika sudah angka (int/float), kembalikan langsung
+            if isinstance(val, (int, float)):
+                return val
+            
+            # Jika string, bersihkan format IDR (Rp, titik ribuan)
+            val_str = str(val).lower()
+            if 'rp' in val_str:
+                val_str = val_str.replace('rp', '').replace('.', '').replace(',', '').strip()
+            else:
+                 # Hapus karakter non-digit kecuali titik desimal jika format international
+                 # Tapi asumsi dataset dominan IDR atau float murni
+                 val_str = re.sub(r'[^\d.]', '', val_str)
+            
+            try:
+                return float(val_str)
+            except:
+                return 0
+
+        df['clean_price'] = df[price_col].apply(safe_clean_price).fillna(0)
     else: return None
     
     if data_type == 'laptop':

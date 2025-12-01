@@ -17,7 +17,7 @@ class SearchResult {
 
 class ApiService {
   String get _baseUrl {
-    const String productionUrl = 'https://drappy-cat-techpilot-backend.hf.space/api';
+    const String productionUrl = 'https://drappy-cat-techpilot-backend.hf.space';
     if (kIsWeb) return productionUrl;
     if (defaultTargetPlatform == TargetPlatform.android) return productionUrl;
     return productionUrl;
