@@ -18,7 +18,7 @@ const LAPTOP_FILE = path.join(DATA_DIR, 'laptops_all_indonesia_fixed_v7.csv');
 // DAFTAR LENGKAP FILE BENCHMARK YANG PERLU DIMUAT
 const CHIPSET_BENCHMARKS = [
     'benchmark_chipset_mediatek.csv',
-    'benchmark_chipset_exynos.csv',  // <--- Sudah Ditambahkan
+    'benchmark_chipset_exynos.csv',  
     'benchmark_chipset_kirin.csv',
     'benchmark_chipset_snapdragon.csv',
     'benchmark_chipset_unisoc.csv',

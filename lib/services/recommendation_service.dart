@@ -5,7 +5,10 @@ import '../models/recommended_product.dart';
 
 class RecommendationService {
   // TODO: Pindahkan URL ke file konfigurasi
-  final String _baseUrl = 'https://drappy-cat-techpilot-backend.hf.space';
+  // GUNAKAN LOCALHOST UNTUK TESTING VIA EMULATOR (10.0.2.2) ATAU WINDOWS (localhost)
+  // final String _baseUrl = 'https://drappy-cat-techpilot-backend.hf.space';
+  final String _baseUrl = 'http://127.0.0.1:5000'; // Untuk Windows Desktop App
+  // final String _baseUrl = 'http://10.0.2.2:5000'; // Untuk Android Emulator
 
   Future<List<RecommendedProduct>> getRecommendations({
     required String type,

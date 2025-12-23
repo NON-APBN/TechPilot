@@ -47,7 +47,34 @@ PRICE_MAP = {
     "pixel 9 pro xl": 26000000,
     "pixel 9 pro": 24000000,
     "pixel 9": 19000000,
+
+    # --- MID/BUDGET RANGE ANCHORS (Crucial for Imputation) ---
+    "galaxy a55": 6000000,
+    "galaxy a54": 5000000,
+    "galaxy a35": 4500000,
+    "galaxy a34": 4000000,
+    "galaxy a15": 2500000,
+    "galaxy a05": 1500000,
+    
+    "redmi note 13 pro+": 5500000,
+    "redmi note 13 pro": 4000000,
+    "redmi note 13": 2500000,
+    "redmi 13c": 1500000,
+    "redmi 12": 1800000,
+    
+    "infinix gt 20 pro": 4500000,
+    "infinix note 40": 2500000,
+    "infinix hot 40": 1500000,
+    
+    "poco f6": 6000000,
+    "poco x6 pro": 4500000,
+    "poco m6": 2000000,
+
+    "iphone 11": 5000000, # Market price 2024 (new/stock/refurb) is around 4-6M
+    "iphone xr": 3500000,
 }
+
+
 
 def update_prices():
     if not os.path.exists(CSV_PATH):

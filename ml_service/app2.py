@@ -496,10 +496,15 @@ def recommend():
                      predicted_price = int(smartphone_model.predict(features)[0])
                  except: pass
 
+            # Calculate range +/- 1.5 Juta or 10%
+            range_margin = max(1500000, int(predicted_price * 0.1))
+            
             p_data = {
                 "product_name": product_name,
                 "price": int(row['clean_price']),
                 "predicted_price": predicted_price,
+                "predicted_price_min": max(0, predicted_price - range_margin),
+                "predicted_price_max": predicted_price + range_margin,
                 "value_score_rp": float(row['value_score']),
                 "raw_data": clean_raw_data,
                 "type": data_type,
