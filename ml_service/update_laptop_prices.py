@@ -65,6 +65,8 @@ def update_prices():
         return
 
     df = pd.read_csv(CSV_PATH)
+    # Reset or Initialize anchor column
+    df['is_anchor'] = 0
     updated_count = 0
     
     # Normalize clean function
@@ -79,6 +81,7 @@ def update_prices():
         for key, price in PRICE_MAP.items():
             if key in name:
                 df.at[idx, 'price_idr'] = price
+                df.at[idx, 'is_anchor'] = 1 # MARK AS TRUSTED
                 print(f"Updated Anchor: {row['model']} -> {price}")
                 matched = True
                 updated_count += 1

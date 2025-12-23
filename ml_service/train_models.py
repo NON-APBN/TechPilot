@@ -131,6 +131,31 @@ def load_all_benchmarks():
     chipset_scores_map = load_benchmark_to_map(CONFIG['CSV_FILES']['CHIPSET_BENCH'], cfg_cols['CHIPSET_NAME'], cfg_cols['CHIPSET_SCORE'])
     print(f"--- [TRAIN] Berhasil memuat {len(chipset_scores_map)} benchmark Chipset HP.")
 
+def clean_ram(val):
+    try:
+        val = str(val).upper()
+        # Find number before GB
+        match = re.search(r'(\d+)\s*GB', val)
+        if match:
+            return int(match.group(1))
+        return 8 # Default
+    except: return 8
+
+def clean_storage(val):
+    try:
+        val = str(val).upper()
+        # Handle TB
+        if 'TB' in val:
+            match = re.search(r'(\d+)\s*TB', val)
+            if match:
+                return int(match.group(1)) * 1024
+        # Handle GB
+        match = re.search(r'(\d+)\s*GB', val)
+        if match:
+            return int(match.group(1))
+        return 512 # Default
+    except: return 512
+
 def load_prep_data(data_type='laptop'):
     cfg_cols = CONFIG['CSV_COLUMNS']
     if data_type == 'laptop':
@@ -180,6 +205,17 @@ def load_prep_data(data_type='laptop'):
         match_results_cpu = df[cpu_col].apply(lambda x: find_best_match_score(x, cpu_scores_map))
         df['cpu_score'] = [res[0] for res in match_results_cpu]
 
+        # --- NEW: PARSE RAM & STORAGE ---
+        if 'ram' in df.columns:
+            df['ram_gb'] = df['ram'].apply(clean_ram)
+        else:
+             df['ram_gb'] = 8
+             
+        if 'storage' in df.columns:
+            df['storage_gb'] = df['storage'].apply(clean_storage)
+        else:
+            df['storage_gb'] = 512
+
     elif data_type == 'smartphone':
         df['chipset_score'] = df[chipset_col].apply(lambda x: find_best_match_score(x, chipset_scores_map)[0])
             
@@ -198,7 +234,8 @@ def train_laptop_model():
         print("[TRAIN ERROR] Tidak ada data laptop valid untuk dilatih. Periksa 'gpu_matching_debug.csv' untuk detail.")
         return
     print(f"[TRAIN INFO] Menggunakan {len(df_train)} data laptop untuk pelatihan.")
-    X = df_train[['cpu_score', 'gpu_score']]
+    # UPDATED: Include RAM and Storage
+    X = df_train[['cpu_score', 'gpu_score', 'ram_gb', 'storage_gb']]
     y = df_train['clean_price']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     model = XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=5, random_state=42)
