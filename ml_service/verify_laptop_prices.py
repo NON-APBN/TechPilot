@@ -84,6 +84,25 @@ def main():
     gpu_scores = load_benchmark_to_map(CONFIG['GPU_FILES'])
     model = joblib.load(MODEL_PATH)
 
+
+def clean_ram(val):
+    try:
+        val = str(val).upper()
+        match = re.search(r'(\d+)\s*GB', val)
+        return int(match.group(1)) if match else 8
+    except: return 8
+
+def clean_storage(val):
+    try:
+        val = str(val).upper()
+        if 'TB' in val:
+            match = re.search(r'(\d+)\s*TB', val)
+            if match:
+                return int(match.group(1)) * 1024
+        match = re.search(r'(\d+)\s*GB', val)
+        return int(match.group(1)) if match else 512
+    except: return 512
+
 def main():
     print("--- Loading Data ---")
     cpu_scores = load_benchmark_to_map(CONFIG['CPU_FILES'])
@@ -109,9 +128,16 @@ def main():
         
         c_score = find_best_match_score(cpu, cpu_scores)
         g_score = find_best_match_score(gpu, gpu_scores)
+        ram = clean_ram(row.get('ram', '8GB'))
+        storage = clean_storage(row.get('storage', '512GB'))
         
         try:
-            pred = model.predict(pd.DataFrame([{'cpu_score': c_score, 'gpu_score': g_score}]))[0]
+            pred = model.predict(pd.DataFrame([{
+                'cpu_score': c_score, 
+                'gpu_score': g_score,
+                'ram_gb': ram,
+                'storage_gb': storage
+            }]))[0]
             
             # Value Calculation
             # 5.0 is fair.
@@ -119,7 +145,9 @@ def main():
             score = min(score, 10.0)
             
             print(f"{n[:35]:<35} | {str(cpu)[:20]:<20} | {format_idr(p):<12} | {format_idr(pred):<12} | {score:.1f}")
-        except: pass
+        except Exception as e: 
+            # print(e)
+            pass
 
 
 if __name__ == "__main__":

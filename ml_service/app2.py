@@ -158,8 +158,35 @@ def load_prep_data(data_type='laptop'):
     else: return None
 
     if data_type == 'laptop':
+        def clean_ram(val):
+            try:
+                val = str(val).upper()
+                match = re.search(r'(\d+)\s*GB', val)
+                return int(match.group(1)) if match else 8
+            except: return 8
+
+        def clean_storage(val):
+            try:
+                val = str(val).upper()
+                if 'TB' in val:
+                    match = re.search(r'(\d+)\s*TB', val)
+                    if match:
+                        return int(match.group(1)) * 1024
+                match = re.search(r'(\d+)\s*GB', val)
+                return int(match.group(1)) if match else 512
+            except: return 512
+
         df['cpu_score'] = df[cpu_col].apply(lambda x: find_best_match_score(x, cpu_scores_map)[0])
         df['gpu_score'] = df[gpu_col].apply(lambda x: find_best_match_score(x, gpu_scores_map)[0])
+        
+        # New Features for Model
+        if 'ram' in df.columns:
+            df['ram_gb'] = df['ram'].apply(clean_ram)
+        else: df['ram_gb'] = 8
+            
+        if 'storage' in df.columns:
+            df['storage_gb'] = df['storage'].apply(clean_storage)
+        else: df['storage_gb'] = 512
     elif data_type == 'smartphone':
         df['chipset_score'] = df[chipset_col].apply(lambda x: find_best_match_score(x, chipset_scores_map)[0])
     return df
@@ -484,7 +511,9 @@ def recommend():
                  try:
                      features = pd.DataFrame([{
                          'cpu_score': row['cpu_score'],
-                         'gpu_score': row['gpu_score']
+                         'gpu_score': row['gpu_score'],
+                         'ram_gb': row.get('ram_gb', 8),
+                         'storage_gb': row.get('storage_gb', 512)
                      }])
                      predicted_price = int(laptop_model.predict(features)[0])
                  except: pass
