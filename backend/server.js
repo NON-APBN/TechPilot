@@ -1,6 +1,6 @@
 // server.js
 const express = require('express');
-const cors = require('cors'); 
+const cors = require('cors');
 const apiRoutes = require('./routes/api');
 
 const app = express();
@@ -9,6 +9,12 @@ app.use(cors());
 
 // Middleware untuk parsing JSON
 app.use(express.json());
+
+// Simple logging middleware
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 
 // Gunakan rute API dengan prefix /api
 app.use('/api', apiRoutes);

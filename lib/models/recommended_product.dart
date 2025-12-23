@@ -1,3 +1,5 @@
+import '../utils/parsers.dart';
+
 enum ProductType {
   laptop,
   smartphone,
@@ -33,34 +35,16 @@ class RecommendedProduct {
   });
 
   factory RecommendedProduct.fromJson(Map<String, dynamic> json, ProductType type) {
-    int parseInt(dynamic value) {
-      if (value is int) return value;
-      if (value is double) return value.toInt();
-      if (value is String) {
-        return int.tryParse(value.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-      }
-      return 0;
-    }
-
-    double parseDouble(dynamic value) {
-      if (value is double) return value;
-      if (value is int) return value.toDouble();
-      if (value is String) {
-        return double.tryParse(value) ?? 0.0;
-      }
-      return 0.0;
-    }
-
     return RecommendedProduct(
       productName: json['product_name'] ?? 'Unknown Device',
-      price: parseInt(json['price']),
-      predictedPrice: parseInt(json['predicted_price']),
-      predictedPriceMin: parseInt(json['predicted_price_min']),
-      predictedPriceMax: parseInt(json['predicted_price_max']),
-      valueScore: parseDouble(json['value_score'] ?? json['value_score_rp'] ?? json['worth_it_score']),
-      cpuScore: json['cpu_score'] != null ? parseDouble(json['cpu_score']) : null,
-      gpuScore: json['gpu_score'] != null ? parseDouble(json['gpu_score']) : null,
-      chipsetScore: json['chipset_score'] != null ? parseDouble(json['chipset_score']) : null,
+      price: Parsers.parseInt(json['price']),
+      predictedPrice: Parsers.parseInt(json['predicted_price']),
+      predictedPriceMin: Parsers.parseInt(json['predicted_price_min']),
+      predictedPriceMax: Parsers.parseInt(json['predicted_price_max']),
+      valueScore: Parsers.parseDouble(json['value_score'] ?? json['value_score_rp'] ?? json['worth_it_score']),
+      cpuScore: json['cpu_score'] != null ? Parsers.parseDouble(json['cpu_score']) : null,
+      gpuScore: json['gpu_score'] != null ? Parsers.parseDouble(json['gpu_score']) : null,
+      chipsetScore: json['chipset_score'] != null ? Parsers.parseDouble(json['chipset_score']) : null,
       type: type,
       rawData: json['raw_data'] ?? {},
       imagePath: json['image'],
@@ -74,12 +58,9 @@ class RecommendedProduct {
     
     // Fallback: Convert to Title Case to match new filename convention
     // e.g. "Asus ROG Strix" -> "Asus Rog Strix.jpg"
+    final cleanName = productName.replaceAll(RegExp(r'[\\/*?:"<>|]'), '');
     
-    // 1. Remove special chars
-    String cleanName = productName.replaceAll(RegExp(r'[\\/*?:"<>|]'), '');
-    
-    // 2. Split by space, capitalize first letter of each word, join
-    String titleCaseName = cleanName.split(' ').map((word) {
+    final titleCaseName = cleanName.split(' ').map((word) {
       if (word.isEmpty) return '';
       return word[0].toUpperCase() + word.substring(1).toLowerCase();
     }).join(' ');
@@ -91,7 +72,6 @@ class RecommendedProduct {
     if (type == ProductType.laptop) {
       final ram = rawData['ram']?.toString() ?? '-';
       final storage = rawData['storage']?.toString() ?? '-';
-      // Clean up strings if needed
       return '$ram | $storage'.replaceAll('SSD', '').replaceAll('NVMe', '').trim(); 
     } else {
       final ram = rawData['ram_capacity']?.toString() ?? rawData['ram']?.toString() ?? '-';
