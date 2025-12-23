@@ -1,30 +1,81 @@
 
 import 'package:flutter/material.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
 
-  // Helper widget untuk membangun setiap baris fitur
-  Widget _buildFeatureRow(BuildContext context, {required IconData icon, required String title, required String subtitle}) {
+  @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+    ));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildFeatureRow(BuildContext context, {required IconData icon, required String title, required String subtitle, required int index}) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0), // Sedikit lebih banyak padding vertikal
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: theme.colorScheme.primary, size: 32), // Ikon lebih besar
-          const SizedBox(width: 20), // Spasi lebih lebar
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)), // Judul fitur lebih menonjol
-                const SizedBox(height: 4),
-                Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54)),
-              ],
-            ),
+    // Staggered animation for each row
+    final delay = 0.4 + (index * 0.1); 
+    final animation = CurvedAnimation(
+      parent: _controller,
+      curve: Interval(delay, 1.0, curve: Curves.easeOut),
+    );
+    
+    return FadeTransition(
+      opacity: animation,
+      child: SlideTransition(
+        position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(animation),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: theme.colorScheme.primary, size: 32),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text(subtitle, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54)),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -32,45 +83,67 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(32.0), // Padding keseluruhan yang lebih besar
+            padding: const EdgeInsets.all(32.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Ikon pembuka yang lebih besar dan menonjol
-                Icon(
-                  Icons.rocket_launch_outlined, // Ikon yang lebih dinamis dan modern
-                  size: 100,
-                  color: theme.colorScheme.primary,
+                // LOGO ANIMATION
+                FadeTransition(
+                  opacity: CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6, curve: Curves.easeOut)),
+                  child: SlideTransition(
+                    position: Tween<Offset>(begin: const Offset(0, -0.2), end: Offset.zero).animate(
+                      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6, curve: Curves.easeOut)),
+                    ),
+                    child: Icon(
+                      Icons.rocket_launch_outlined,
+                      size: 100,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 24),
-                Text(
-                  'Selamat Datang di TechPilot!',
-                  style: theme.textTheme.displaySmall?.copyWith( // Menggunakan displaySmall untuk judul yang sangat besar
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 700), // Batasi lebar deskripsi agar tidak terlalu panjang
-                  child: Text(
-                    'Platform cerdas Anda untuk menemukan gadget impian. Jelajahi rekomendasi personal, manfaatkan asisten AI, dan bandingkan spesifikasi dengan mudah.',
-                    style: theme.textTheme.titleMedium?.copyWith(color: Colors.black87), // Deskripsi lebih menonjol
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 48), // Spasi lebih besar sebelum fitur
                 
-                // Membungkus fitur dalam ConstrainedBox agar tidak terlalu lebar di layar besar
+                // TITLE ANIMATION
+                FadeTransition(
+                  opacity: CurvedAnimation(parent: _controller, curve: const Interval(0.2, 0.7, curve: Curves.easeOut)),
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Column(
+                      children: [
+                        Text(
+                          'Selamat Datang di TechPilot!',
+                          style: theme.textTheme.displaySmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.primary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 700),
+                          child: Text(
+                            'Platform cerdas Anda untuk menemukan gadget impian. Jelajahi rekomendasi personal, manfaatkan asisten AI, dan bandingkan spesifikasi dengan mudah.',
+                            style: theme.textTheme.titleMedium?.copyWith(color: Colors.black87),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 48),
+
+                // FEATURES ANIMATION
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 700), // Batasi lebar fitur agar tetap mudah dibaca
+                  constraints: const BoxConstraints(maxWidth: 700),
                   child: Column(
                     children: [
                       _buildFeatureRow(
@@ -78,36 +151,47 @@ class WelcomePage extends StatelessWidget {
                         icon: Icons.lightbulb_outline,
                         title: 'Rekomendasi Pintar',
                         subtitle: 'Dapatkan saran gadget yang paling sesuai dengan budget dan kebutuhan Anda.',
+                        index: 0,
                       ),
                       _buildFeatureRow(
                         context,
                         icon: Icons.chat_bubble_outline,
                         title: 'AI Assistant',
                         subtitle: 'Tanya apa saja tentang gadget dan dapatkan jawaban personal dari asisten AI kami.',
+                        index: 1,
                       ),
                       _buildFeatureRow(
                         context,
                         icon: Icons.compare_arrows_outlined,
                         title: 'Bandingkan Detail',
                         subtitle: 'Lihat perbandingan spesifikasi gadget secara berdampingan untuk keputusan terbaik.',
+                        index: 2,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 48), // Spasi lebih besar sebelum tombol
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400), // Batasi lebar tombol agar tidak terlalu lebar
-                  child: SizedBox(
-                    width: double.infinity, // Tombol mengisi lebar yang tersedia dalam ConstrainedBox
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 40), // Tombol lebih besar
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Sudut tombol lebih bulat
+                const SizedBox(height: 48),
+                
+                // BUTTON ANIMATION
+                FadeTransition(
+                  opacity: CurvedAnimation(parent: _controller, curve: const Interval(0.7, 1.0, curve: Curves.easeOut)),
+                  child: ScaleTransition(
+                    scale: CurvedAnimation(parent: _controller, curve: const Interval(0.7, 1.0, curve: Curves.elasticOut)),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 40),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(context, '/home');
+                          },
+                          child: const Text('Ayo Mulai Petualangan Gadget Anda!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                        ),
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/home');
-                      },
-                      child: const Text('Ayo Mulai Petualangan Gadget Anda!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)), // Teks tombol lebih menarik
                     ),
                   ),
                 ),

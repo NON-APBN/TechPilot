@@ -86,4 +86,17 @@ class RecommendedProduct {
     
     return 'assets/images/$titleCaseName.jpg';
   }
+
+  String get specs {
+    if (type == ProductType.laptop) {
+      final ram = rawData['ram']?.toString() ?? '-';
+      final storage = rawData['storage']?.toString() ?? '-';
+      // Clean up strings if needed
+      return '$ram | $storage'.replaceAll('SSD', '').replaceAll('NVMe', '').trim(); 
+    } else {
+      final ram = rawData['ram_capacity']?.toString() ?? rawData['ram']?.toString() ?? '-';
+      final storage = rawData['internal_memory']?.toString() ?? rawData['storage']?.toString() ?? '-';
+      return 'RAM $ram | $storage';
+    }
+  }
 }

@@ -64,6 +64,16 @@ class ProductCard extends StatelessWidget {
                       fontSize: 14,
                     ),
                   ),
+                  const SizedBox(height: 2),
+                  Text(
+                    product.specs,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 11,
+                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                    ),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     'Rp ${(product.price / 1000000).toStringAsFixed(1)} Juta',
