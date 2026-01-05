@@ -138,6 +138,15 @@ def clean_ram(val):
         match = re.search(r'(\d+)\s*GB', val)
         if match:
             return int(match.group(1))
+        
+        # New: Robust fallback for simple numbers or "16 RAM"
+        match_simple = re.search(r'\b(\d+)\s*(?:RAM|MEMORY)?\b', val)
+        if match_simple:
+             # Sanity check: RAM is usually 4, 8, 16, 32, 64, 128
+             num = int(match_simple.group(1))
+             if num in [4, 8, 12, 16, 24, 32, 48, 64, 96, 128]:
+                 return num
+                 
         return 8 # Default
     except: return 8
 
@@ -153,6 +162,14 @@ def clean_storage(val):
         match = re.search(r'(\d+)\s*GB', val)
         if match:
             return int(match.group(1))
+            
+        # New: Robust fallback just looking for reasonable numbers (128, 256, 512, 1024)
+        match_simple = re.search(r'\b(\d{3,4})\b', val) # Look for 3-4 digit numbers
+        if match_simple:
+            num = int(match_simple.group(1))
+            if num in [128, 256, 512, 1000, 1024, 2048]:
+                return num
+                
         return 512 # Default
     except: return 512
 

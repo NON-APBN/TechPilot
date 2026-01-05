@@ -115,6 +115,9 @@ chipset_scores_map = {}
 
 def load_all_benchmarks():
     global cpu_scores_map, gpu_scores_map, chipset_scores_map
+    if cpu_scores_map and gpu_scores_map and chipset_scores_map:
+        return # Already loaded
+
     cfg_cols = CONFIG['CSV_COLUMNS']
     cpu_scores_map = load_benchmark_to_map(CONFIG['CSV_FILES']['CPU_BENCH'], cfg_cols['CPU_NAME'], cfg_cols['CPU_SCORE'], fallback_name_col='Chipset')
     print(f"--- [ML INFO] Berhasil memuat {len(cpu_scores_map)} benchmark CPU.")
@@ -122,6 +125,10 @@ def load_all_benchmarks():
     print(f"--- [ML INFO] Berhasil memuat {len(gpu_scores_map)} benchmark GPU.")
     chipset_scores_map = load_benchmark_to_map(CONFIG['CSV_FILES']['CHIPSET_BENCH'], cfg_cols['CHIPSET_NAME'], cfg_cols['CHIPSET_SCORE'])
     print(f"--- [ML INFO] Berhasil memuat {len(chipset_scores_map)} benchmark Chipset HP.")
+
+# Load benchmarks immediately on import
+print("--- [ML INFO] Memuat benchmark saat startup... ---")
+load_all_benchmarks()
 
 def load_prep_data(data_type='laptop'):
     cfg_cols = CONFIG['CSV_COLUMNS']
@@ -610,19 +617,16 @@ def compare():
         print(f"ERROR /compare: {e}\n{trace}")
         return jsonify({"error": str(e), "trace": trace}), 500
 
-if __name__ == '__main__':
-    print("--- [ML INFO] Memuat benchmark saat startup... ---")
-    load_all_benchmarks()
-    
-    try:
-        laptop_model = joblib.load(os.path.join(BASE_DIR, 'laptop_model.pkl'))
-        print("--- [ML INFO] Model Laptop dimuat.")
-    except: print("--- [ML WARN] Model Laptop tidak ditemukan.")
-    
-    try:
-        smartphone_model = joblib.load(os.path.join(BASE_DIR, 'smartphone_model.pkl'))
-        print("--- [ML INFO] Model Smartphone dimuat.")
-    except: print("--- [ML WARN] Model Smartphone tidak ditemukan.")
+try:
+    laptop_model = joblib.load(os.path.join(BASE_DIR, 'laptop_model.pkl'))
+    print("--- [ML INFO] Model Laptop dimuat.")
+except: print("--- [ML WARN] Model Laptop tidak ditemukan.")
 
+try:
+    smartphone_model = joblib.load(os.path.join(BASE_DIR, 'smartphone_model.pkl'))
+    print("--- [ML INFO] Model Smartphone dimuat.")
+except: print("--- [ML WARN] Model Smartphone tidak ditemukan.")
+
+if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
