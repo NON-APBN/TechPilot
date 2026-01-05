@@ -18,7 +18,7 @@ const LAPTOP_FILE = path.join(DATA_DIR, 'laptops_all_indonesia_fixed_v7.csv');
 // DAFTAR LENGKAP FILE BENCHMARK YANG PERLU DIMUAT
 const CHIPSET_BENCHMARKS = [
     'benchmark_chipset_mediatek.csv',
-    'benchmark_chipset_exynos.csv',  
+    'benchmark_chipset_exynos.csv',
     'benchmark_chipset_kirin.csv',
     'benchmark_chipset_snapdragon.csv',
     'benchmark_chipset_unisoc.csv',
@@ -69,15 +69,23 @@ const getMinMaxStats = (data, fields) => {
 
 function loadCSV(filePath) {
     return new Promise((resolve, reject) => {
+        if (!fs.existsSync(filePath)) {
+            console.warn(`[CSV Loader] Warning: File not found: ${path.basename(filePath)}. Skipping.`);
+            return resolve([]); // Return empty for resilience
+        }
+
         const results = [];
         fs.createReadStream(filePath)
-          .pipe(csv())
-          .on('data', (data) => results.push(data))
-          .on('end', () => {
-              console.log(`[CSV Loader] ${path.basename(filePath)} dimuat, total baris: ${results.length}`);
-              resolve(results);
-          })
-          .on('error', reject);
+            .pipe(csv())
+            .on('data', (data) => results.push(data))
+            .on('end', () => {
+                console.log(`[CSV Loader] ${path.basename(filePath)} loaded, total rows: ${results.length}`);
+                resolve(results);
+            })
+            .on('error', (err) => {
+                console.error(`[CSV Loader] Error reading ${path.basename(filePath)}: ${err.message}`);
+                resolve([]); // Soft fail
+            });
     });
 }
 

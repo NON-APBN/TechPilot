@@ -4,11 +4,11 @@ import numpy as np
 import os
 import re
 from sklearn.ensemble import RandomForestRegressor
+from ml_utils import (
+    BASE_DIR, DATA_DIR, CSV_PATH_LAPTOPS as CSV_PATH,
+    load_benchmark_to_map, find_score, clean_name
+)
 
-# Config
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, '..', 'backend', 'data')
-CSV_PATH = os.path.join(DATA_DIR, 'laptops_all_indonesia_fixed_v7.csv')
 CONFIG = {
     'CPU_FILES': [
         'benchmark_prosesor_intel.csv',
@@ -21,55 +21,6 @@ CONFIG = {
         'benchmark_GPU_AMD.csv'
     ],
 }
-
-def clean_name(name):
-    if not isinstance(name, str): return ""
-    name = name.lower()
-    name = re.sub(r'\d+gb', '', name)
-    name = name.replace('nvidia', '').replace('geforce', '').replace('amd', '').replace('radeon', '').replace('graphics', '')
-    name = re.sub(r'[^\w\s]', ' ', name)
-    name = re.sub(r'\s+', ' ', name.strip())
-    return name
-
-def load_benchmark_to_map(files, primary_name_col='name', score_col='score'):
-    all_data = []
-    for f in files:
-        try:
-            path = os.path.join(DATA_DIR, f)
-            if os.path.exists(path):
-                df = pd.read_csv(path)
-                cols = df.columns
-                # Flexible column finding
-                n_col = next((c for c in cols if 'model' in c.lower() or 'name' in c.lower()), cols[0]) 
-                # Score column often "Multicores Score" or "Graphics Score"
-                s_col = next((c for c in cols if 'score' in c.lower() or 'bench' in c.lower()), cols[-1])
-                
-                temp = df[[n_col, s_col]].rename(columns={n_col: 'name', s_col: 'score'})
-                all_data.append(temp)
-        except: pass
-        
-    if not all_data: return {}
-    bench_df = pd.concat(all_data).drop_duplicates()
-    bench_df['score'] = pd.to_numeric(bench_df['score'].astype(str).str.replace(',', ''), errors='coerce').fillna(0)
-    return pd.Series(bench_df['score'].values, index=bench_df['name'].apply(clean_name)).to_dict()
-
-
-def find_score(name, score_map):
-    if not isinstance(name, str): return 0
-    clean = clean_name(name)
-    if clean in score_map: return score_map[clean]
-    
-    # Fuzzy match
-    best = 0
-    shortest_diff = 999
-    for k, v in score_map.items():
-        if k in clean or clean in k:
-            diff = abs(len(k) - len(clean))
-            if diff < shortest_diff:
-                shortest_diff = diff
-                best = v
-    return best
-
 
 def clean_ram(val):
     try:
@@ -98,6 +49,7 @@ def main():
     print("--- 2. Calculating Scores ---")
     df['cpu_score'] = df['cpu'].apply(lambda x: find_score(x, cpu_scores))
     df['gpu_score'] = df['gpu'].apply(lambda x: find_score(x, gpu_scores))
+
     
     # NEW: Feature Engineering for Imputation
     df['ram_gb'] = df['ram'].apply(clean_ram)
