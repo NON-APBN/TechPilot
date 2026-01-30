@@ -1,6 +1,8 @@
 class AppConfig {
   // Base URL for the backend API
-  // Use 10.0.2.2 for Android Emulator, localhost for Windows/iOS Simulator
+  // Base URL for the backend API
+  // Gunakan 127.0.0.1 untuk Web (Chrome) atau iOS Simulator.
+  // Jika nanti di-deploy, ganti dengan URL domain asli (misal https://api.techpilot.com)
   static const String apiUrl = 'http://127.0.0.1:5000'; 
   
   // Timeout duration for API calls

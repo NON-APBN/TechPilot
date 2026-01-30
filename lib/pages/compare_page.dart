@@ -398,6 +398,28 @@ class _ComparisonResult extends StatelessWidget {
     if (score1 == 0 && score2 == 0) {
       winner = null;
       reason = AppLocalizations.of(context).get('compare_no_benchmark');
+    } else if (price1 <= 1.0 && price2 <= 1.0) {
+      // Both prices invalid
+      winner = null; 
+      reason = AppLocalizations.of(context).get('compare_no_price_data'); // Ensure this key exists or add fallback
+    } else if (price1 <= 1.0) {
+      // P1 price invalid -> P2 wins if it has score
+      if (score2 > 0) {
+         winner = p2;
+         reason = AppLocalizations.of(context).get('compare_better_value_vs_unknown'); // "Better value (vs Unknown Price)"
+      } else {
+         winner = null;
+          reason = AppLocalizations.of(context).get('compare_insufficient_data');
+      }
+    } else if (price2 <= 1.0) {
+      // P2 price invalid -> P1 wins if it has score
+      if (score1 > 0) {
+         winner = p1;
+         reason = AppLocalizations.of(context).get('compare_better_value_vs_unknown');
+      } else {
+         winner = null;
+         reason = AppLocalizations.of(context).get('compare_insufficient_data');
+      }
     } else if (ratio1 > ratio2) {
       winner = p1;
       reason = "${AppLocalizations.of(context).get('compare_better_value')} (${(ratio1 * 1000000).toStringAsFixed(1)} vs ${(ratio2 * 1000000).toStringAsFixed(1)}).";

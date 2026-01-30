@@ -84,6 +84,12 @@ class AppLocalizations {
       'compare_select_brand': 'Pilih Brand',
       'compare_select_model': 'Pilih Model',
       'compare_instruction': 'Silakan pilih brand dan model produk untuk melihat spesifikasi detail.',
+      'compare_no_benchmark': 'Data benchmark tidak tersedia.',
+      'compare_better_value': 'Nilai Lebih Baik',
+      'compare_ai_recommendation': 'REKOMENDASI AI',
+      'compare_no_price_data': 'Data harga tidak tersedia.',
+      'compare_better_value_vs_unknown': 'Nilai Lebih Baik (vs Harga Tidak Diketahui)',
+      'compare_insufficient_data': 'Data tidak cukup.',
       
       // About Us Page
       'about_title': 'Tentang Kami',
@@ -185,6 +191,12 @@ class AppLocalizations {
       'compare_select_brand': 'Select Brand',
       'compare_select_model': 'Select Model',
       'compare_instruction': 'Please select a brand and model to view detailed specifications.',
+      'compare_no_benchmark': 'Benchmark data unavailable.',
+      'compare_better_value': 'Better Value',
+      'compare_ai_recommendation': 'AI RECOMMENDATION',
+      'compare_no_price_data': 'Price data unavailable.',
+      'compare_better_value_vs_unknown': 'Better Value (vs Unknown Price)',
+      'compare_insufficient_data': 'Insufficient data.',
       
       // About Us Page
       'about_title': 'About Us',

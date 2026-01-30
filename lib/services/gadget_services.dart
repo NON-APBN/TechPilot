@@ -19,14 +19,27 @@ class GadgetService {
 
         if (nameIndex != -1 && cpuIndex != -1) {
           for (var row in laptopRows.skip(1)) {
-            // Sanitize name for image path
-            String sanitizedName = row[nameIndex].toString().replaceAll(RegExp(r'[\\/*?:"<>|]'), '_');
-            allGadgets.add(Gadget(
-              name: row[nameIndex].toString(),
-              type: 'laptop',
-              processor: row[cpuIndex].toString(),
-              image: 'assets/images/$sanitizedName.jpg',
-            ));
+            try {
+              // Safety check: ensure row has enough columns
+              if (row.length <= nameIndex || row.length <= cpuIndex) continue;
+
+              final nameVal = row[nameIndex].toString();
+              final cpuVal = row[cpuIndex].toString();
+
+              if (nameVal.isEmpty) continue;
+
+              // Sanitize name for image path
+              String sanitizedName = nameVal.replaceAll(RegExp(r'[\\/*?:"<>|]'), '_');
+              allGadgets.add(Gadget(
+                name: nameVal,
+                type: 'laptop',
+                processor: cpuVal.isEmpty ? 'Unknown Processor' : cpuVal,
+                image: 'assets/images/$sanitizedName.jpg',
+              ));
+            } catch (e) {
+               debugPrint('Error parsing laptop row: $e');
+               continue; // Skip bad row, don't crash
+            }
           }
         }
       }
@@ -47,15 +60,29 @@ class GadgetService {
 
         if (nameIndex != -1 && chipsetIndex != -1 && cameraIndex != -1) {
           for (var row in smartphoneRows.skip(1)) {
-            // Sanitize name for image path
-            String sanitizedName = row[nameIndex].toString().replaceAll(RegExp(r'[\\/*?:"<>|]'), '_');
-            allGadgets.add(Gadget(
-              name: row[nameIndex].toString(),
-              type: 'smartphone',
-              processor: row[chipsetIndex].toString(),
-              camera: row[cameraIndex].toString(),
-              image: 'assets/images/$sanitizedName.jpg',
-            ));
+             try {
+               // Safety check
+               if (row.length <= nameIndex) continue;
+               
+               final nameVal = row[nameIndex].toString();
+               if (nameVal.isEmpty) continue;
+
+               final chipsetVal = (chipsetIndex < row.length) ? row[chipsetIndex].toString() : '';
+               final cameraVal = (cameraIndex < row.length) ? row[cameraIndex].toString() : '';
+
+              // Sanitize name for image path
+              String sanitizedName = nameVal.replaceAll(RegExp(r'[\\/*?:"<>|]'), '_');
+              allGadgets.add(Gadget(
+                name: nameVal,
+                type: 'smartphone',
+                processor: chipsetVal.isEmpty ? 'Unknown Chipset' : chipsetVal,
+                camera: cameraVal.isEmpty ? '-' : cameraVal,
+                image: 'assets/images/$sanitizedName.jpg',
+              ));
+             } catch (e) {
+                debugPrint('Error parsing smartphone row: $e');
+                continue;
+             }
           }
         }
       }
